@@ -1,0 +1,24 @@
+:root {
+  font-family: Kanit, Static;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --primary :rgb(29, 1, 156);
+  --secondary: rgb(4, 149, 185);
+  --terciary: rgb(4, 76, 172);
+  --black-back:rgb(31, 31, 31);
+  --soft-white:rgb(245, 246, 226);
+  --contrary:rgb(37, 219, 247);
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+select {
+  width: 15rem;
+}

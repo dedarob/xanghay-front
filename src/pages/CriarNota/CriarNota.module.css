@@ -1,0 +1,24 @@
+.tabela_criar_nota {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabela_criar_nota,
+.th_criar_nota,
+.td_criar_nota {
+  border: 1px solid #ddd;
+}
+
+.th_criar_nota,
+.td_criar_nota {
+  padding: 15px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.th_criar_nota {
+  background-color: #d32f2f;
+  color: white;
+}

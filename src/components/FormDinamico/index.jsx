@@ -1,43 +1,59 @@
-import { useForm, useFieldArray } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
+import styles from "./FormDinamico.module.css";
+import { FaTrash } from "react-icons/fa";
+import { HiPlusSm } from "react-icons/hi";
 
-function FormDinamico() {
-  const { control, register } = useForm();
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control, // control props comes from useForm (optional: if you are using FormProvider)
-      name: "arrayNota",
-      // unique name for your Field Array
-    }
-  );
+function FormDinamico({ control, register }) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "arrayNota",
+  });
 
   return (
     <>
       {fields.map((field, index) => (
-        <div key={field.id} className={styles.linhaDaNota}>
-          <input
-            placeholder="Quantidade"
-            {...register(`arrayNota.${index}.quantidade`)}
-          />
-          <input
-            placeholder="Produto"
-            {...register(`arrayNota.${index}.produto`)}
-          />
-          <input
-            placeholder="Valor Unitário"
-            {...register(`arrayNota.${index}.valorUni`)}
-          />
-          <input
-            placeholder="Valor Total"
-            {...register(`arrayNota.${index}.valorTotal`)}
-          />
-          <button
-            type="button"
-            onClick={() => append({ firstName: "bill", lastName: "luo" })}
-          >
-            Append
-          </button>
-        </div>
+        <tr key={field.id} className={styles.linhaEscrita}>
+          <td>
+            <input {...register(`arrayNota.${index}.quantidade`)} />
+          </td>
+          <td>
+            <input {...register(`arrayNota.${index}.produto`)} />
+          </td>
+          <td>
+            <input {...register(`arrayNota.${index}.valorUni`)} />
+          </td>
+          <td>
+            <input {...register(`arrayNota.${index}.valorTotal`)} />
+          </td>
+          <td>
+            <button
+              className={styles.botaoRemover}
+              type="button"
+              onClick={() => remove(index)}
+            >
+              <FaTrash />
+            </button>
+          </td>
+        </tr>
       ))}
+      <tr>
+        <td colSpan="5">
+          <button
+            className={styles.botaoAddLinha}
+            type="button"
+            onClick={() =>
+              append({
+                quantidade: "",
+                produto: "",
+                valorUni: "",
+                valorTotal: "",
+              })
+            }
+          >
+            <HiPlusSm />
+          </button>
+        </td>
+      </tr>
     </>
   );
 }

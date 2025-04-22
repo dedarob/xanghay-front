@@ -2,9 +2,10 @@ import styles from "./CriarNota.module.css";
 import Header from "../../components/Header";
 import { useForm } from "react-hook-form";
 import FormDinamico from "../../components/FormDinamico";
+import { PiFilePdf } from "react-icons/pi";
 
 function CriarNota() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, control } = useForm();
   const onSubmit = (data) => console.log(data);
 
   return (
@@ -14,11 +15,15 @@ function CriarNota() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.CriarNota}>
           <label htmlFor="nomeCliente">Nome do Cliente</label>
-          <input {...register("nomeCliente")} />
-        </div>
-        <div>
+          <input
+            className={styles.preencherDadosCliente}
+            {...register("nomeCliente")}
+          />
           <label htmlFor="enderecoCliente">Endereco</label>
-          <input {...register("enderecoCliente")} />
+          <input
+            className={styles.preencherDadosCliente}
+            {...register("enderecoCliente")}
+          />
         </div>
         <div>
           <table className={styles.tabela_criar_nota}>
@@ -31,11 +36,15 @@ function CriarNota() {
                 <th className={styles.th_criar_nota}>Ação</th>
               </tr>
             </thead>
+            <tbody>
+              <FormDinamico control={control} register={register} />
+            </tbody>
           </table>
         </div>
-        <FormDinamico />
-        <button>Adicionar Linha</button>
-        <button>Gerar Nota</button>
+
+        <button type="submit" className={styles.botaoGerarNota}>
+          <PiFilePdf />
+        </button>
       </form>
     </>
   );

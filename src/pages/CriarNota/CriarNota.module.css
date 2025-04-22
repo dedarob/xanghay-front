@@ -22,3 +22,42 @@
   background-color: #d32f2f;
   color: white;
 }
+
+.botaoGerarNota {
+  border: none;
+}
+.botaoGerarNota svg {
+  font-size: 3rem;
+  border: none;
+  padding: 0.4rem;
+  background-color: rgb(116, 237, 182);
+  border-radius: 1rem;
+  transition: 0.2s;
+  display: block;
+  margin: 0.5rem;
+}
+
+.botaoGerarNota :hover {
+  background-color: rgb(0, 255, 191);
+  cursor: pointer;
+  border-radius: 1rem;
+  font-size: 3.1rem;
+}
+
+.preencherDadosCliente {
+  margin-left: 1rem;
+}
+
+.CriarNota {
+  display: flex;
+  flex-direction: column;
+}
+
+.preencherDadosCliente {
+  margin-top: 0;
+  width: 90%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}

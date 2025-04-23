@@ -2,13 +2,14 @@ import { useFieldArray } from "react-hook-form";
 import styles from "./FormDinamico.module.css";
 import { FaTrash } from "react-icons/fa";
 import { HiPlusSm } from "react-icons/hi";
+import { Controller } from "react-hook-form";
+import DinheiroInput from "../DinheiroInput";
 
 function FormDinamico({ control, register }) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "arrayNota",
   });
-
   return (
     <>
       {fields.map((field, index) => (
@@ -20,10 +21,28 @@ function FormDinamico({ control, register }) {
             <input {...register(`arrayNota.${index}.produto`)} />
           </td>
           <td>
-            <input {...register(`arrayNota.${index}.valorUni`)} />
+            <Controller
+              control={control}
+              name={`arrayNota.${index}.valorUni`}
+              render={({ field }) => (
+                <DinheiroInput
+                  value={field.value}
+                  onValueChange={field.onChange}
+                />
+              )}
+            />
           </td>
           <td>
-            <input {...register(`arrayNota.${index}.valorTotal`)} />
+            <Controller
+              control={control}
+              name={`arrayNota.${index}.valorTotal`}
+              render={({ field }) => (
+                <DinheiroInput
+                  value={field.value}
+                  onValueChange={field.onChange}
+                />
+              )}
+            />
           </td>
           <td>
             <button

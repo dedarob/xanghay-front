@@ -3,10 +3,18 @@ import Header from "../../components/Header";
 import { useForm } from "react-hook-form";
 import FormDinamico from "../../components/FormDinamico";
 import { PiFilePdf } from "react-icons/pi";
+import { useState, useEffect } from "react";
 
 function CriarNota() {
   const { register, handleSubmit, control } = useForm();
   const onSubmit = (data) => console.log(data);
+
+  const [moneySum, setMoneySum] = useState("0");
+  useEffect(() => {
+    setTimeout(() => {
+      setMoneySum((count) => count + 1);
+    }, 1000);
+  });
 
   return (
     <>

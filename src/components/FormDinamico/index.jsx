@@ -40,6 +40,7 @@ function FormDinamico({ control, register }) {
                 <DinheiroInput
                   value={field.value}
                   onValueChange={field.onChange}
+                  disabled
                 />
               )}
             />
@@ -55,8 +56,8 @@ function FormDinamico({ control, register }) {
           </td>
         </tr>
       ))}
-      <tr>
-        <td colSpan="5">
+      <tr className={styles.areaTotaleAdicionar}>
+        <td>
           <button
             className={styles.botaoAddLinha}
             type="button"

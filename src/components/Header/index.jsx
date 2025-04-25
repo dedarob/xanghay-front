@@ -7,7 +7,12 @@ function Header() {
       <Link to="/criar-nota">
         <span>Xanghay</span>
       </Link>
-      <nav>teste</nav>
+      <nav>
+        <Link to="/registro-cliente"> registro</Link>
+      </nav>
+      <nav>
+        <Link to="/ver-clientes"> vercliente</Link>
+      </nav>
     </header>
   );
 }

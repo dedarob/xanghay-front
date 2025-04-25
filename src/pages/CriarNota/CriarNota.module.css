@@ -1,3 +1,14 @@
+.areaForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.areaDadosCliente {
+  display: flex;
+  flex-direction: column;
+}
+
 .tabela_criar_nota {
   width: 100%;
   border-collapse: collapse;

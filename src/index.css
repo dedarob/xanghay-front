@@ -45,3 +45,12 @@ input:focus {
 label {
   margin: 0.3rem;
 }
+
+body {
+  min-height: 100vh;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}

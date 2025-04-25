@@ -1,0 +1,24 @@
+.around_botoes_acao {
+  display: flex;
+  flex-direction: row;
+  margin: 1rem;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.around_botoes_acao button {
+  border: 2px solid black;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: 0.3s;
+}
+.around_botoes_acao :hover {
+  font-size: 1rem;
+}
+.icon_trash {
+  background-color: red;
+  transition: 0.3s;
+}
+
+.icon_trash:hover {
+  background-color: rgb(151, 5, 5);
+}

@@ -1,0 +1,34 @@
+.formCliente {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: rgb(210, 210, 210);
+  border: 2px solid black;
+  width: 30em;
+  align-items: center;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+.formCliente input {
+  width: 90%;
+}
+
+.areaFormCliente {
+  margin-top: 3%;
+}
+
+.formCliente button {
+  font-size: 3rem;
+  border-radius: 1rem;
+  background-color: rgb(166, 246, 74);
+  display: flex;
+  padding: 0.5rem;
+  margin: 1rem;
+}
+
+.formCliente button:hover {
+  background-color: rgb(107, 191, 3);
+  transition: 0.3s;
+  cursor: pointer;
+}

@@ -12,7 +12,8 @@
   transition: 0.3s;
 }
 .around_botoes_acao :hover {
-  font-size: 1rem;
+  cursor: pointer;
+  color: rgb(33, 181, 3);
 }
 .icon_trash {
   background-color: red;
@@ -21,4 +22,13 @@
 
 .icon_trash:hover {
   background-color: rgb(151, 5, 5);
+  cursor: pointer;
+}
+
+.rowWhite {
+  background-color: white;
+}
+
+.rowGray {
+  background-color: #cdcdcd; /* Um cinza bem levinho */
 }

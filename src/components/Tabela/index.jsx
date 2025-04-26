@@ -17,7 +17,17 @@ const Tabela = ({ rows, columns }) => {
           <FaTrash />
         </button>
       </div>
-      <DataGrid rows={rows} columns={columns} pageSize={5} autoHeight />
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={5}
+        autoHeight
+        getRowClassName={(params) =>
+          params.indexRelativeToCurrentPage % 2 === 0
+            ? styles.rowWhite
+            : styles.rowGray
+        }
+      />
     </div>
   );
 };

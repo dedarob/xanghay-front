@@ -7,6 +7,8 @@ const rows = [
   { id: 1, name: "Data Grid", description: "the Community version" },
   { id: 2, name: "Data Grid Pro", description: "the Pro version" },
   { id: 3, name: "Data Grid Premium", description: "the Premium version" },
+  { id: 4, name: "Data Grid Premium", description: "the Premium version" },
+  { id: 5, name: "Data Grid Premium", description: "the Premium version" },
 ];
 
 const columns = [

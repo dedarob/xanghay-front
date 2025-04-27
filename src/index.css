@@ -54,3 +54,8 @@ body {
   height: 100%;
   margin: 0;
 }
+
+button {
+  background: none;
+}
+

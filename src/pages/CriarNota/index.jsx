@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import DinheiroInput from "../../components/DinheiroInput";
 import Container from "../../components/Container";
+import SelectBox from "../../components/SelectBox";
 
 function CriarNota() {
   const { register, handleSubmit, control, setValue, watch } = useForm();
@@ -46,6 +47,8 @@ function CriarNota() {
     }
   }, [arrayNotaAtt, setValue, moneySum]);
 
+  const [isSearchable, setIsSearchable] = useState(true);
+
   return (
     <>
       <Header />
@@ -58,6 +61,7 @@ function CriarNota() {
               className={styles.preencherDadosCliente}
               {...register("nomeCliente")}
             />
+            <SelectBox />
             <label htmlFor="enderecoCliente">Endereco</label>
             <input
               className={styles.preencherDadosCliente}

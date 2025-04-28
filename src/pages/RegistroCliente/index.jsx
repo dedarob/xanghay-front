@@ -5,11 +5,14 @@ import TelefoneInput from "../../components/TelefoneInput";
 import { IoIosSave } from "react-icons/io";
 import { CgController } from "react-icons/cg";
 import Container from "../../components/Container";
+import { fetch } from "./service";
+import { useNavigate } from "react-router-dom";
 
 function RegistroCliente() {
+  const navigate = useNavigate();
   const { register, handleSubmit, control } = useForm();
   const onSubmit = (data) => {
-    console.log(data);
+    fetch(data, navigate);
     //colocar o que acontece ao apertar botao de submit
   };
   return (

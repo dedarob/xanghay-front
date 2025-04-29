@@ -10,6 +10,13 @@ import Container from "../../components/Container";
 import SelectBox from "../../components/SelectBox";
 
 function CriarNota() {
+  const options = [
+    { value: "chocolate", label: "Chocolate" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "vanilla", label: "Vanilla" },
+  ];
+  const [isSearchable, setIsSearchable] = useState(true);
+
   const { register, handleSubmit, control, setValue, watch } = useForm();
   const onSubmit = (data) => {
     console.log(data);
@@ -47,8 +54,6 @@ function CriarNota() {
     }
   }, [arrayNotaAtt, setValue, moneySum]);
 
-  const [isSearchable, setIsSearchable] = useState(true);
-
   return (
     <>
       <Header />
@@ -57,11 +62,19 @@ function CriarNota() {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.areaForm}>
           <div className={styles.areaDadosCliente}>
             <label htmlFor="nomeCliente">Nome do Cliente</label>
-            <input
-              className={styles.preencherDadosCliente}
-              {...register("nomeCliente")}
+
+            <Controller
+              control={control}
+              name={"mudarDepois"}
+              render={({ field }) => (
+                <SelectBox
+                  className={styles.preencherDadosCliente}
+                  options={options}
+                  isSearchable={isSearchable}
+                />
+              )}
             />
-            <SelectBox />
+
             <label htmlFor="enderecoCliente">Endereco</label>
             <input
               className={styles.preencherDadosCliente}

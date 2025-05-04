@@ -8,22 +8,16 @@ import { Controller } from "react-hook-form";
 import DinheiroInput from "../../components/DinheiroInput";
 import Container from "../../components/Container";
 import SelectBox from "../../components/SelectBox";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function CriarNota() {
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
+  const apiPath = "/cliente";
+  const navigate = useNavigate();
+  const [comboBox, setComboBox] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
 
   const { register, handleSubmit, control, setValue, watch } = useForm();
-  const onSubmit = (data) => {
-    console.log(data);
-    setFormData(data);
-    console.log("soma aqui" + moneySum);
-  }; //a partir daqui vamos pro axios
-
   const [formData, setFormData] = useState(null);
   const [moneySum, setMoneySum] = useState(0);
   const arrayNotaAtt = useWatch({
@@ -32,19 +26,42 @@ function CriarNota() {
   });
 
   useEffect(() => {
+    const fetchComboBoxData = () => {
+      axios
+        .get(import.meta.env.VITE_BACKEND_KEY + apiPath, {
+          params: { returnTypes: "idAndNome" },
+        })
+        .then(function (response) {
+          const data = response.data;
+          const mappedData = data.map((item) => ({
+            value: item.id,
+            label: item.nomeCliente,
+          }));
+          setComboBox(mappedData);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    };
+
+    fetchComboBoxData();
+  }, []);
+
+  const onSubmit = (data) => {
+    console.log("Form Data:", data);
+    setFormData(data);
+    console.log("Total Geral:", moneySum);
+  };
+
+  useEffect(() => {
     if (!arrayNotaAtt || !Array.isArray(arrayNotaAtt)) return;
 
     let totalGeral = 0;
-    let valoresAtualizados = false;
-
     arrayNotaAtt.forEach((item, i) => {
       const totalItem = (item?.valorUni || 0) * (item?.quantidade || 0);
-
       if (item?.valorTotal !== totalItem) {
         setValue(`arrayNota.${i}.valorTotal`, totalItem, { shouldDirty: true });
-        valoresAtualizados = true;
       }
-
       totalGeral += totalItem;
     });
 
@@ -65,20 +82,14 @@ function CriarNota() {
 
             <Controller
               control={control}
-              name={"mudarDepois"}
+              name={"selectBoxNome"}
               render={({ field }) => (
                 <SelectBox
                   className={styles.preencherDadosCliente}
-                  options={options}
+                  options={comboBox}
                   isSearchable={isSearchable}
                 />
               )}
-            />
-
-            <label htmlFor="enderecoCliente">Endereco</label>
-            <input
-              className={styles.preencherDadosCliente}
-              {...register("enderecoCliente")}
             />
           </div>
           <div>

@@ -1,7 +1,18 @@
+import { DataSourceRowsUpdateStrategy } from "@mui/x-data-grid/internals";
 import axios from "axios";
 const apiPath = "/cliente";
 
 export function fetch(data, navigate) {
+  if (
+    !data ||
+    !data.nomeCliente ||
+    !data.cidadeCliente ||
+    !data.enderecoClienteRegistro ||
+    !data.telefoneCliente
+  ) {
+    alert("array vazio");
+    return;
+  }
   axios
     .post(import.meta.env.VITE_BACKEND_KEY + apiPath, {
       nomeCliente: data.nomeCliente,
@@ -11,8 +22,11 @@ export function fetch(data, navigate) {
     })
 
     .then(() => {
-      alert("Registro realizado com sucesso!");
-      navigate("/");
+      {
+        console.log(data);
+        alert("Registro realizado com sucesso!");
+        navigate("/");
+      }
     })
 
     .catch((error) => {

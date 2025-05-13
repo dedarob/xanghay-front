@@ -13,7 +13,7 @@ function Header() {
       <nav className={styles.navLinks}>
         <Link to="/registro-cliente">registro</Link>
         <Link to="/ver-clientes">vercliente</Link>
-        <Link to="/debitos">debitos</Link>
+        <Link to="/notas">Notas</Link>
       </nav>
     </header>
   );

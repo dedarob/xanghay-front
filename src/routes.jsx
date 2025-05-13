@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import CriarNota from "./pages/CriarNota";
 import RegistroCliente from "./pages/RegistroCliente";
 import VerClientes from "./pages/VerClientes";
-import Debitos from "./pages/Debitos";
+import Notas from "./pages/Notas";
 
 function AppRoutes() {
   return (
@@ -12,7 +12,7 @@ function AppRoutes() {
       <Route path="/criar-nota" element={<CriarNota />} />
       <Route path="/registro-cliente" element={<RegistroCliente />} />
       <Route path="/ver-clientes" element={<VerClientes />} />
-      <Route path="/debitos" element={<Debitos />} />
+      <Route path="/notas" element={<Notas />} />
     </Routes>
   );
 }

@@ -6,10 +6,7 @@ export default function SelectBox({ options, isSearchable, onChange, value }) {
     <Select
       options={options}
       isSearchable={isSearchable}
-      onChange={(onChange) => {
-        const valor = onChange;
-        console.log(valor);
-      }}
+      onChange={onChange} // Corrigido aqui
       value={value}
     />
   );

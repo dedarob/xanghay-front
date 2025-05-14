@@ -1,7 +1,13 @@
 import styles from "./DinheiroInput.module.css";
 import { NumericFormat } from "react-number-format";
 
-function DinheiroInput({ value, onValueChange, disabled, placeholder }) {
+function DinheiroInput({
+  value,
+  onValueChange,
+  disabled,
+  placeholder,
+  className,
+}) {
   return (
     <NumericFormat
       value={value}
@@ -14,7 +20,7 @@ function DinheiroInput({ value, onValueChange, disabled, placeholder }) {
       prefix="R$"
       decimalScale={2}
       fixedDecimalScale={true}
-      className={styles.inputBoxDinheiro}
+      className={className}
       disabled={disabled}
       placeholder={placeholder}
     />

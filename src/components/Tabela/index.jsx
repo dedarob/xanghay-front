@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from "./Tabela.module.css";
 import { FaTrash, FaPlus, FaPen } from "react-icons/fa";
 
-const Tabela = ({ rows, columns }) => {
+const Tabela = ({ rows, columns, onRowClick }) => {
   return (
     <div>
       <div className={styles.around_botoes_acao}>
@@ -27,6 +27,7 @@ const Tabela = ({ rows, columns }) => {
             ? styles.rowWhite
             : styles.rowGray
         }
+        onRowClick={onRowClick}
       />
     </div>
   );

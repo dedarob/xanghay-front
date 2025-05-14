@@ -5,6 +5,7 @@ import Tabela from "../../components/Tabela";
 import Header from "../../components/Header";
 import Container from "../../components/Container";
 import styles from "./Notas.module.css";
+import DinheiroInput from "../../components/DinheiroInput";
 
 function Notas() {
   const [clientes, setClientes] = useState([]);
@@ -16,7 +17,19 @@ function Notas() {
     { field: "dataEmissao", headerName: "Data de Emissão", width: 180 },
     { field: "idCliente", headerName: "ID Cliente", width: 120 },
     { field: "nomeCliente", headerName: "Nome Cliente", width: 200 },
-    { field: "valorTotal", headerName: "Valor Total", width: 150 },
+    {
+      field: "valorTotal",
+      headerName: "Valor Total",
+      width: 150,
+      renderCell: (params) => (
+        <DinheiroInput
+          className={styles.dinheiroFormatado}
+          value={params.value}
+          onValueChange={() => {}}
+          disabled={true}
+        />
+      ),
+    },
   ];
 
   useEffect(() => {
@@ -59,7 +72,13 @@ function Notas() {
           value={clienteSelecionado}
         />
         <div className={styles.viewVerClientes}>
-          <Tabela columns={columns} rows={notas} />
+          <Tabela
+            columns={columns}
+            rows={notas}
+            onRowClick={(params) => {
+              console.log("ID da nota:", params.row.id);
+            }}
+          />
         </div>
       </Container>
     </>

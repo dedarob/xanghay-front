@@ -16,7 +16,6 @@ function CriarNota() {
   const navigate = useNavigate();
   const [comboBox, setComboBox] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
-
   const { register, handleSubmit, control, setValue, watch } = useForm();
   const [formData, setFormData] = useState(null);
   const [moneySum, setMoneySum] = useState(0);
@@ -76,18 +75,28 @@ function CriarNota() {
       <Header />
       <Container>
         <span>Tabela de Serviços</span>
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.areaForm}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
+          className={styles.areaForm}
+        >
           <div className={styles.areaDadosCliente}>
             <label htmlFor="nomeCliente">Nome do Cliente</label>
 
             <Controller
               control={control}
-              name={"selectBoxNome"}
+              name={"cliente"}
               render={({ field }) => (
                 <SelectBox
                   className={styles.preencherDadosCliente}
                   options={comboBox}
                   isSearchable={isSearchable}
+                  onChange={(selected) => {
+                    field.onChange(selected);
+                  }}
+                  value={field.value}
                 />
               )}
             />

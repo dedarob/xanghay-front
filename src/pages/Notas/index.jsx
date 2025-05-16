@@ -6,8 +6,11 @@ import Header from "../../components/Header";
 import Container from "../../components/Container";
 import styles from "./Notas.module.css";
 import DinheiroInput from "../../components/DinheiroInput";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function Notas() {
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [notas, setNotas] = useState([]);
@@ -77,6 +80,7 @@ function Notas() {
             rows={notas}
             onRowClick={(params) => {
               console.log("ID da nota:", params.row.id);
+              navigate(`/itens-nota/${params.row.id}`);
             }}
           />
         </div>

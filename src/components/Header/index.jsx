@@ -6,14 +6,15 @@ function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.logotipo}>
-        <Link to="/criar-nota">
+        <Link to="/">
           <MdManageAccounts /> Xanghay
         </Link>
       </div>
       <nav className={styles.navLinks}>
-        <Link to="/registro-cliente">registro</Link>
-        <Link to="/ver-clientes">vercliente</Link>
-        <Link to="/notas">Notas</Link>
+        <Link to="/registro-cliente">Registro</Link>
+        <Link to="/ver-clientes">Ver Clientes</Link>
+        <Link to="/notas">Ver Notas</Link>
+        <Link to="/criar-nota">Criar Nota</Link>
       </nav>
     </header>
   );

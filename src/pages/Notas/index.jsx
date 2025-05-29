@@ -73,6 +73,7 @@ function Notas() {
           isSearchable={true}
           onChange={setClienteSelecionado}
           value={clienteSelecionado}
+          placeholder="Clique para pesquisar o cliente"
         />
         <div className={styles.viewVerClientes}>
           <Tabela

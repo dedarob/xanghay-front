@@ -2,27 +2,56 @@ import styles from "./VerClientes.module.css";
 import Header from "../../components/Header";
 import Tabela from "../../components/Tabela";
 import Container from "../../components/Container";
-
-const rows = [
-  { id: 1, name: "Data Grid", description: "the Community version" },
-  { id: 2, name: "Data Grid Pro", description: "the Pro version" },
-  { id: 3, name: "Data Grid Premium", description: "the Premium version" },
-  { id: 4, name: "Data Grid Premium", description: "the Premium version" },
-  { id: 5, name: "Data Grid Premium", description: "the Premium version" },
-];
-
-const columns = [
-  { field: "name", headerName: "Product Name", width: 200 },
-  { field: "description", headerName: "Description", width: 300 },
-];
+import { useState } from "react";
+import axios from "axios";
+import { data } from "react-router-dom";
+import { useEffect } from "react";
+import TelefoneInput from "../../components/TelefoneInput";
 
 function VerClientes() {
+  const apiPath = "/cliente";
+  const [clientes, setClientes] = useState([]);
+  useEffect(() => {
+    axios
+      .get(import.meta.env.VITE_BACKEND_KEY + apiPath)
+      .then((response) => {
+        {
+          setClientes(response.data);
+          console.log(response.data);
+        }
+      })
+
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }, []);
+
+  const columns = [
+    { field: "id", headerName: "Identificador Cliente", width: 150 },
+    { field: "nomeCliente", headerName: "Nome do Cliente", width: 290 },
+    { field: "cidadeCliente", headerName: "Cidade", width: 150 },
+    { field: "enderecoCliente", headerName: "Endereço", width: 280 },
+    {
+      field: "telefoneCliente",
+      headerName: "Telefone",
+      width: 180,
+      renderCell: (params) => (
+        <TelefoneInput
+          className={styles.telefoneFormatado}
+          value={params.value}
+          onValueChange={() => {}}
+          disabled={true}
+        />
+      ),
+    },
+  ];
+
   return (
     <>
       <Header />
       <Container>
         <div className={styles.viewVerClientes}>
-          <Tabela columns={columns} rows={rows} />
+          <Tabela columns={columns} rows={clientes} />
         </div>
       </Container>
     </>

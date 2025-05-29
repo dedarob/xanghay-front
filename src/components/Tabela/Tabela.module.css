@@ -30,5 +30,14 @@
 }
 
 .rowGray {
-  background-color: #cdcdcd; /* Um cinza bem levinho */
+  background-color: #cdcdcd;
+}
+.rowWhite:hover {
+  background-color: #70edf4 !important;
+  cursor: pointer;
+}
+
+.rowGray:hover {
+  background-color: #70edf4 !important;
+  cursor: pointer;
 }

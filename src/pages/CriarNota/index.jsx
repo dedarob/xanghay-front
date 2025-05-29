@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 function CriarNota() {
   const apiPath = "/cliente";
+  const postApiPath = "/notas";
   const navigate = useNavigate();
   const [comboBox, setComboBox] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
@@ -45,11 +46,34 @@ function CriarNota() {
 
     fetchComboBoxData();
   }, []);
-
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
+    console.log("Form Data (raw JSON):", JSON.stringify(data, null, 2));
     setFormData(data);
     console.log("Total Geral:", moneySum);
+
+    const payload = {
+      notaSimples: {
+        clienteId: data.cliente.value,
+        dataEmissao: new Date().toISOString().split("T")[0],
+      },
+      itens: data.arrayNota.map((item) => ({
+        descricao: item.produto,
+        quantidade: item.quantidade,
+        precoUnitario: item.valorUni,
+      })),
+    };
+
+    axios
+      .post(import.meta.env.VITE_BACKEND_KEY + postApiPath, payload)
+      .then((response) => {
+        console.log("backend request resultado", response.data);
+        alert("Registro realizado com sucesso!");
+
+        console.log(payload);
+      })
+      .catch((error) => {
+        console.log("erro no fetch de insercao de notas", error.message);
+      });
   };
 
   useEffect(() => {
@@ -97,6 +121,7 @@ function CriarNota() {
                     field.onChange(selected);
                   }}
                   value={field.value}
+                  placeholder="Clique para pesquisar o cliente"
                 />
               )}
             />

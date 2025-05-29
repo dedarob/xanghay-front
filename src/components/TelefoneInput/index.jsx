@@ -1,7 +1,13 @@
 import styles from "./TelefoneInput.module.css";
 import { PatternFormat } from "react-number-format";
 
-function TelefoneInput({ value, onValueChange, disabled, placeholder }) {
+function TelefoneInput({
+  value,
+  onValueChange,
+  disabled,
+  placeholder,
+  className,
+}) {
   return (
     <PatternFormat
       value={value}
@@ -13,6 +19,7 @@ function TelefoneInput({ value, onValueChange, disabled, placeholder }) {
       mask="_"
       disabled={disabled}
       placeholder={placeholder}
+      className={className}
     />
   );
 }

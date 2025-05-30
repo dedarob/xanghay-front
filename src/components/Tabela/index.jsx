@@ -3,19 +3,33 @@ import PropTypes from "prop-types";
 import styles from "./Tabela.module.css";
 import { FaTrash, FaPlus, FaPen } from "react-icons/fa";
 
-const Tabela = ({ rows, columns, onRowClick }) => {
+const Tabela = ({
+  rows,
+  columns,
+  onRowClick,
+  onAddClick,
+  onEditClick,
+  onDeleteClick,
+  showActions = true,
+}) => {
   return (
     <div>
       <div className={styles.around_botoes_acao}>
-        <button>
-          <FaPlus className={styles.icon} />
-        </button>
-        <button>
-          <FaPen className={styles.icon} />
-        </button>
-        <button className={styles.icon_trash}>
-          <FaTrash />
-        </button>
+        {onAddClick && (
+          <button onClick={onAddClick}>
+            <FaPlus className={styles.icon} />
+          </button>
+        )}
+        {onEditClick && (
+          <button onClick={onEditClick}>
+            <FaPen className={styles.icon} />
+          </button>
+        )}
+        {onDeleteClick && (
+          <button onClick={onDeleteClick} className={styles.icon_trash}>
+            <FaTrash />
+          </button>
+        )}
       </div>
       <DataGrid
         rows={rows}

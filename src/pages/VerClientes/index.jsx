@@ -7,8 +7,11 @@ import axios from "axios";
 import { data } from "react-router-dom";
 import { useEffect } from "react";
 import TelefoneInput from "../../components/TelefoneInput";
+import { useNavigate } from "react-router-dom";
+import Modal from "../../components/Modal";
 
 function VerClientes() {
+  const navigate = useNavigate();
   const apiPath = "/cliente";
   const [clientes, setClientes] = useState([]);
   useEffect(() => {
@@ -45,13 +48,23 @@ function VerClientes() {
       ),
     },
   ];
-
+  const [estadoModal, setEstadoModal] = useState(false);
   return (
     <>
       <Header />
       <Container>
         <div className={styles.viewVerClientes}>
-          <Tabela columns={columns} rows={clientes} />
+          <Tabela
+            columns={columns}
+            rows={clientes}
+            onAddClick={() => navigate("/registro-cliente")}
+            onEditClick={() => setEstadoModal(true)}
+            onDeleteClick={() => console.log("Deletar")}
+          />
+          <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
+            <label htmlFor="">teste</label>
+            <input type="text" placeholder="teste" />
+          </Modal>
         </div>
       </Container>
     </>

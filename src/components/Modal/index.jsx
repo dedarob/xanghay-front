@@ -12,7 +12,7 @@ const Modal = ({ aberto, onFechar, children }) => {
             <FaWindowClose />
           </button>
         </div>
-        {children}
+        <div>{children}</div>
       </div>
     </div>
   );

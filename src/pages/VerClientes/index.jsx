@@ -2,31 +2,27 @@ import styles from "./VerClientes.module.css";
 import Header from "../../components/Header";
 import Tabela from "../../components/Tabela";
 import Container from "../../components/Container";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { data } from "react-router-dom";
-import { useEffect } from "react";
 import TelefoneInput from "../../components/TelefoneInput";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../components/Modal";
+import { useForm } from "react-hook-form";
 
 function VerClientes() {
   const navigate = useNavigate();
   const apiPath = "/cliente";
   const [clientes, setClientes] = useState([]);
+  const [estadoModal, setEstadoModal] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
+
+  const { register, handleSubmit, setValue, watch, reset } = useForm();
+
   useEffect(() => {
     axios
       .get(import.meta.env.VITE_BACKEND_KEY + apiPath)
-      .then((response) => {
-        {
-          setClientes(response.data);
-          console.log(response.data);
-        }
-      })
-
-      .catch((error) => {
-        console.log(error.message);
-      });
+      .then((response) => setClientes(response.data))
+      .catch((error) => console.log(error.message));
   }, []);
 
   const columns = [
@@ -48,7 +44,20 @@ function VerClientes() {
       ),
     },
   ];
-  const [estadoModal, setEstadoModal] = useState(false);
+
+  const handleRowClick = (params) => {
+    setSelectedRowId(params.id);
+    reset(params.row);
+  };
+
+  const onSubmit = (data) => {
+    console.log("pra salvar:", data);
+    //axios aq
+    setEstadoModal(false);
+  };
+
+  const formValues = watch();
+
   return (
     <>
       <Header />
@@ -60,14 +69,41 @@ function VerClientes() {
             onAddClick={() => navigate("/registro-cliente")}
             onEditClick={() => setEstadoModal(true)}
             onDeleteClick={() => console.log("Deletar")}
+            onRowClick={handleRowClick}
+            getRowClassName={(params) =>
+              params.id === selectedRowId ? styles.selectedRow : ""
+            }
           />
           <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
-            <label htmlFor="">teste</label>
-            <input type="text" placeholder="teste" />
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {Object.entries(formValues).map(([key, value]) => {
+                if (key === "id") return null; // Não mostra o ID
+
+                return (
+                  <div key={key} className={styles.modalInputGroup}>
+                    <label htmlFor={key}>{key}</label>
+                    {key === "telefoneCliente" ? (
+                      <TelefoneInput
+                        id={key}
+                        value={value}
+                        onValueChange={(val) => setValue(key, val)}
+                      />
+                    ) : (
+                      <input id={key} type="text" {...register(key)} />
+                    )}
+                  </div>
+                );
+              })}
+
+              <button type="submit" className={styles.botaoModal}>
+                Salvar
+              </button>
+            </form>
           </Modal>
         </div>
       </Container>
     </>
   );
 }
+
 export default VerClientes;

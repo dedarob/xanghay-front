@@ -13,7 +13,6 @@ function RegistroCliente() {
   const { register, handleSubmit, control } = useForm();
   const onSubmit = (data) => {
     fetch(data, navigate);
-    //colocar o que acontece ao apertar botao de submit
   };
   return (
     <>

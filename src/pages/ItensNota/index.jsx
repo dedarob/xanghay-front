@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import Modal from "../../components/Modal";
 
 function ItensNota() {
   const { idNota } = useParams();
@@ -37,7 +39,7 @@ function ItensNota() {
   }, [idNota]);
 
   const columns = [
-    { field: "id", headerName: "Identificador Nota", width: 130 },
+    { field: "notaId", headerName: "Identificador Nota", width: 130 },
     { field: "descricao", headerName: "Produto/Serviço", width: 290 },
     { field: "quantidade", headerName: "Quantidade", width: 120 },
     {
@@ -67,15 +69,125 @@ function ItensNota() {
       ),
     },
   ];
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    watch: watchEdit,
+    reset: resetEdit,
+  } = useForm();
+
+  const {
+    register: registerAdd,
+    handleSubmit: handleSubmitAdd,
+    reset: resetAdd,
+    watch: watchAdd,
+  } = useForm();
+  const [estadoModal, setEstadoModal] = useState(false);
+  const [estadoModalAdicionar, setEstadoModalAdicionar] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const formValues = watchEdit();
+  const formValuesAdd = watchAdd();
+  const handleRowClick = (params) => {
+    setSelectedRowId(params.id);
+    resetEdit(params.row);
+  };
+  const onSubmit = (data) => {
+    console.log("submit", data);
+    //axios do put vai aqui qnd criar, n esquece de usar o usestate do row no address
+  };
+  const onAddSubmit = (data) => {
+    console.log("submit de add", data);
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_KEY}/notas/colocar-item/${idNota}`,
+        data
+      )
+
+      .then(() => {
+        {
+          console.log(data);
+          alert("Registro realizado com sucesso!");
+          navigate("/");
+        }
+      })
+
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+  const dadosDoResetDeAdd = {
+    descricao: "",
+    quantidade: 0,
+    precoUnitario: 0,
+    precoTotal: 0,
+  };
   return (
     <>
-      <Tabela columns={columns} rows={itens} />
+      <Tabela
+        columns={columns}
+        rows={itens}
+        onAddClick={() => {
+          resetAdd(dadosDoResetDeAdd);
+          setEstadoModalAdicionar(true);
+        }}
+        onEditClick={() => setEstadoModal(true)}
+        onDeleteClick={() => console.log("delete")}
+        onRowClick={handleRowClick}
+      />
       <DinheiroInput
         className={styles.dinheiroFormatado}
         value={totalNota}
         onValueChange={() => {}}
         disabled={true}
       />
+      <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
+        <form
+          onSubmit={handleSubmitEdit((data) => {
+            onSubmit(data);
+          })}
+        >
+          {Object.entries(formValues).map(([key, value]) => {
+            if (key === "id") return null;
+
+            return (
+              <div key={key} className={styles.modalInputGroup}>
+                <label htmlFor={key}>{key}</label>
+                <input id={key} type="text" {...registerEdit(key)} />
+              </div>
+            );
+          })}
+
+          <button type="submit" className={styles.botaoModal}>
+            Salvar
+          </button>
+        </form>
+      </Modal>
+      <Modal
+        aberto={estadoModalAdicionar}
+        onFechar={() => setEstadoModalAdicionar(false)}
+      >
+        <form
+          onSubmit={handleSubmitAdd((data) => {
+            onAddSubmit(data);
+          })}
+        >
+          {" "}
+          <label>Adicionando a nota de Identificador {formValues.notaId}</label>
+          {Object.entries(formValuesAdd).map(([key, value]) => {
+            if (key === "notaId" || key === "id") return null;
+
+            return (
+              <div key={key} className={styles.modalInputGroup}>
+                <label htmlFor={key}>{key}</label>
+                <input id={key} type="text" {...registerAdd(key)} />
+              </div>
+            );
+          })}
+          <button type="submit" className={styles.botaoModal}>
+            Salvar
+          </button>
+        </form>
+      </Modal>
     </>
   );
 }

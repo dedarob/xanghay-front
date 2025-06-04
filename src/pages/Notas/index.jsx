@@ -8,6 +8,7 @@ import styles from "./Notas.module.css";
 import DinheiroInput from "../../components/DinheiroInput";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
 
 function Notas() {
   const navigate = useNavigate();
@@ -62,7 +63,25 @@ function Notas() {
       .then((res) => setNotas(res.data))
       .catch((err) => console.log(err));
   }, [clienteSelecionado]);
-
+  const [modalDelete, setModalDelete] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const handleRowClickInDeleteMode = (params) => {
+    setSelectedRowId(params.row.id);
+  };
+  const deletarNota = (selectedRowId) => {
+    axios
+      .delete(
+        `${
+          import.meta.env.VITE_BACKEND_KEY
+        }/notas/deletar-nota/${selectedRowId}`
+      )
+      .then(() => {
+        alert(`Nota de ID ${selectedRowId} excluída com sucesso`);
+        setModalDeleteConfirm(false);
+        buscarItensPorNota();
+      })
+      .catch((error) => console.log(error.message));
+  };
   return (
     <>
       <Header />
@@ -83,9 +102,30 @@ function Notas() {
               console.log("ID da nota:", params.row.id);
               navigate(`/itens-nota/${params.row.id}`);
             }}
+            onDeleteClick={() => setModalDelete(true)}
           />
         </div>
       </Container>
+      <ConfirmDeleteModal
+        aberto={modalDelete}
+        onFechar={() => setModalDelete(false)}
+        className={styles.deleteModal}
+        onConfirmarDelete={() => {
+          deletarNota(selectedRowId);
+          setModalDelete(false);
+        }}
+      >
+        <div className={styles.areaTabelaModal}>
+          <Tabela
+            columns={columns}
+            rows={notas}
+            onRowClick={(params) => {
+              console.log("nota pra deletar:", params.row.id);
+              handleRowClickInDeleteMode(params);
+            }}
+          />
+        </div>
+      </ConfirmDeleteModal>
     </>
   );
 }

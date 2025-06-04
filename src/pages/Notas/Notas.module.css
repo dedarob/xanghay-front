@@ -9,3 +9,13 @@
   box-sizing: border-box;
   font-weight: bold;
 }
+.deleteModal {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  height: 100%;
+}
+.areaTabelaModal {
+  width: 100%;
+  height: 70%;
+}

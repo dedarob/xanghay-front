@@ -9,3 +9,8 @@
   box-sizing: border-box;
   font-weight: bold;
 }
+
+.modalDeDeletar {
+  height: 50%;
+  width: 60%;
+}

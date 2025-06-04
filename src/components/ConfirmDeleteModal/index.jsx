@@ -7,6 +7,8 @@ export default function ConfirmDeleteModal({
   onFechar,
   headerMessage,
   onConfirmarDelete,
+  className,
+  children,
 }) {
   const [codigoConfirmacao, setCodigoConfirmacao] = useState("");
   const [inputConfirmacao, setInputConfirmacao] = useState("");
@@ -19,8 +21,23 @@ export default function ConfirmDeleteModal({
     }
   }, [aberto]);
 
+  function handleConfirmDelete() {
+    if (inputConfirmacao !== codigoConfirmacao) {
+      alert("O código digitado está incorreto. Por favor, tente novamente.");
+      return;
+    }
+
+    const confirmado = window.confirm(
+      "Tem certeza que deseja apagar? Esta ação não pode ser desfeita."
+    );
+
+    if (confirmado) {
+      onConfirmarDelete();
+    }
+  }
+
   return (
-    <Modal aberto={aberto} onFechar={onFechar}>
+    <Modal aberto={aberto} onFechar={onFechar} className={className}>
       <div className={styles.areaConfirmDeletar}>
         <h1>{headerMessage}</h1>
         <p>Digite o código abaixo para confirmar a exclusão:</p>
@@ -42,6 +59,7 @@ export default function ConfirmDeleteModal({
           maxLength={codigoConfirmacao.length}
           placeholder="Digite o código aqui"
         />
+        {children}
         <div className={styles.areaConfirmDeletar}>
           <button
             className={styles.botaoCancelar}
@@ -52,8 +70,7 @@ export default function ConfirmDeleteModal({
           </button>
           <button
             className={styles.botaoPross}
-            onClick={onConfirmarDelete}
-            disabled={inputConfirmacao !== codigoConfirmacao}
+            onClick={handleConfirmDelete}
             type="button"
           >
             Apagar

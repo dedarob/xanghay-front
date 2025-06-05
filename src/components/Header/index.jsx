@@ -15,6 +15,7 @@ function Header() {
         <Link to="/ver-clientes">Ver Clientes</Link>
         <Link to="/notas">Ver Notas</Link>
         <Link to="/criar-nota">Criar Nota</Link>
+        <Link to="/add-pag">Adicionar Pagamentos</Link>
       </nav>
     </header>
   );

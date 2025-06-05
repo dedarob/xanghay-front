@@ -12,16 +12,15 @@
 .header a {
   text-decoration: none;
   color: var(--soft-white);
-  padding-inline: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   transition: 0.3s;
   border-radius: 1.5rem;
   padding-top: 5px;
-  transition: 0.3s;
+  transition: all 0.3s ease 0s;
 }
 
-.header :hover {
-  font-size: 1.7rem;
+.header a:hover {
+  transform: translateY(-7px);
 }
 
 .logotipo {

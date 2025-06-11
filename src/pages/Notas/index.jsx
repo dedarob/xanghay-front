@@ -103,6 +103,7 @@ function Notas() {
               navigate(`/itens-nota/${params.row.id}`);
             }}
             onDeleteClick={() => setModalDelete(true)}
+            onDollarClick={() => navigate("/nota-fin")}
           />
         </div>
       </Container>

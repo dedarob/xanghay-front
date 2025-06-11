@@ -6,6 +6,7 @@ import VerClientes from "./pages/VerClientes";
 import Notas from "./pages/Notas";
 import ItensNota from "./pages/ItensNota";
 import AddPagamentos from "./pages/AddPagamentos";
+import NotaFinanceiro from "./pages/NotaFinanceiro";
 
 function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ function AppRoutes() {
       <Route path="/notas" element={<Notas />} />
       <Route path="/itens-nota/:idNota" element={<ItensNota />} />
       <Route path="/add-pag" element={<AddPagamentos />} />
+      <Route path="/nota-fin" element={<NotaFinanceiro />} />
     </Routes>
   );
 }

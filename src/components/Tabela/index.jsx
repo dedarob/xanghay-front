@@ -1,7 +1,7 @@
 import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import styles from "./Tabela.module.css";
-import { FaTrash, FaPlus, FaPen } from "react-icons/fa";
+import { FaTrash, FaPlus, FaPen, FaDollarSign } from "react-icons/fa";
 
 const Tabela = ({
   rows,
@@ -10,10 +10,12 @@ const Tabela = ({
   onAddClick,
   onEditClick,
   onDeleteClick,
+  onDollarClick,
   showActions = true,
+  className,
 }) => {
   return (
-    <div>
+    <div className={className}>
       <div className={styles.around_botoes_acao}>
         {onAddClick && (
           <button onClick={onAddClick}>
@@ -23,6 +25,11 @@ const Tabela = ({
         {onEditClick && (
           <button onClick={onEditClick}>
             <FaPen className={styles.icon} />
+          </button>
+        )}
+        {onDollarClick && (
+          <button onClick={onDollarClick}>
+            <FaDollarSign className={styles.icon} />
           </button>
         )}
         {onDeleteClick && (

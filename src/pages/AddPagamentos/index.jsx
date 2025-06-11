@@ -15,9 +15,44 @@ export default function AddPagamentos() {
   const { handleSubmit, control, register } = useForm();
   const [comboBox, setComboBox] = useState([]);
   const onSubmit = (data) => {
-    console.log("enviado para bda", data);
+    const hoje = new Date();
+    const yyyy = hoje.getFullYear();
+    const mm = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoje.getDate()).padStart(2, "0");
+    const dataLocal = `${yyyy}-${mm}-${dd}`;
+    let valorPago = data.vlrPagamento;
+
+    if (typeof valorPago === "string") {
+      valorPago = parseFloat(
+        valorPago.replace(/[^\d,.-]/g, "").replace(",", ".")
+      );
+    }
+
+    const payload = {
+      dataPagamento: new Date().toISOString().split("T")[0],
+      valorPago,
+      clienteId: data.cliente?.value,
+      metodoPag: data.metodoDePagamentoSelect?.value.toUpperCase(),
+    };
+
+    const clienteId = payload.clienteId;
+
+    console.log("enviado para bda", payload);
+
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_KEY}/pagamentos/${clienteId}`,
+        payload
+      )
+      .then((response) => {
+        alert("Pagamento registrado com sucesso");
+        console.log("Resposta do servidor:", response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao enviar pagamento:", error.message);
+      });
   };
-  const payload = {};
+
   const [metodoPag, setMetodoPag] = useState();
   useEffect(() => {
     console.log(metodoPag);

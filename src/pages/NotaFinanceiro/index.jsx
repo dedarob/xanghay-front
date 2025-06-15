@@ -11,7 +11,11 @@ import axios from "axios";
 export default function NotaFinanceiro() {
   const columns = [
     { field: "id", headerName: "ID Nota", width: 70 },
-    { field: "idPagamento", headerName: "ID Pagamento", width: 70 },
+    {
+      field: "idPagamento",
+      headerName: "ID Pagamento Ultimo Pagamento",
+      width: 70,
+    },
     { field: "dataEmissao", headerName: "Data de Emissão", width: 150 },
     { field: "nomeCliente", headerName: "Nome Cliente", width: 170 },
     {
@@ -66,13 +70,13 @@ export default function NotaFinanceiro() {
         let cor = "";
 
         switch (params.value) {
-          case "Pago":
+          case "PAGO":
             cor = "green";
             break;
-          case "Parcialmente Pago":
+          case "PARCIALMENTE PAGO":
             cor = "blue";
             break;
-          case "Em Aberto":
+          case "EM ABERTO":
           default:
             cor = "red";
             break;

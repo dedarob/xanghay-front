@@ -1,0 +1,87 @@
+.formCliente {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: rgb(210, 210, 210);
+  border: 2px solid black;
+  width: 30em;
+  max-width: 95vw; /* Para ficar responsivo em telas pequenas */
+  align-items: center;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.5rem 1rem; /* Espaço interno para ficar mais leve */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* Sombra leve para destaque */
+}
+
+.formCliente label {
+  align-self: flex-start; /* Para alinhar as labels à esquerda */
+  font-weight: 600;
+  margin-left: 5%;
+  margin-bottom: 0.25rem;
+}
+
+.formCliente input,
+.formCliente select,
+.formCliente textarea {
+  width: 90%;
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border: 1.5px solid #555;
+  border-radius: 0.5rem;
+
+  transition: border-color 0.3s;
+}
+
+.formCliente input:focus,
+.formCliente select:focus,
+.formCliente textarea:focus {
+  border-color: rgb(107, 191, 3);
+  background-color: #f5fff0;
+}
+
+.formCliente textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.areaFormCliente {
+  margin-top: 3%;
+  display: flex;
+  justify-content: center; /* Centraliza o formulário na área */
+}
+
+.formCliente button:not(.botaoAnexo) {
+  font-size: 3rem;
+  border-radius: 1rem;
+  display: flex;
+  padding: 0.5rem 1rem;
+  margin: 1rem;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  color: #2a2a2a;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.formCliente button:hover {
+  background-color: rgb(107, 191, 3);
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+.botaoAnexo {
+  border-radius: 0.3rem;
+  background-color: rgb(107, 191, 3);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.3rem;
+  padding: 0.6rem;
+  width: 90%;
+  transition: background-color 0.3s;
+}
+
+.botaoAnexo:hover {
+  background-color: rgb(81, 145, 2);
+}

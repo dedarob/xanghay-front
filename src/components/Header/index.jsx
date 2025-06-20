@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import styles from "./Header.module.css";
 import { MdManageAccounts } from "react-icons/md";
+import styles from "./Header.module.css";
 
 function Header() {
   return (
@@ -11,6 +11,7 @@ function Header() {
         </Link>
       </div>
       <nav className={styles.navLinks}>
+        <Link to="/add-boleto">Ver Boletos</Link>
         <Link to="/registro-cliente">Registro</Link>
         <Link to="/ver-clientes">Ver Clientes</Link>
         <Link to="/notas">Ver Notas</Link>

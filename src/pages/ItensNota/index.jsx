@@ -1,14 +1,14 @@
-import styles from "./ItensNota.module.css";
-import Tabela from "../../components/Tabela";
-import DinheiroInput from "../../components/DinheiroInput";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { useForm } from "react-hook-form";
-import Modal from "../../components/Modal";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
+import DinheiroInput from "../../components/DinheiroInput";
+import Modal from "../../components/Modal";
 import { PiSubtitlesDuotone } from "react-icons/pi";
+import Tabela from "../../components/Tabela";
+import axios from "axios";
+import styles from "./ItensNota.module.css";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { useState } from "react";
 
 function ItensNota() {
   const { idNota } = useParams();

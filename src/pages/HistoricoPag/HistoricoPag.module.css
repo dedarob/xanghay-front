@@ -1,0 +1,13 @@
+.bordaVerde {
+  border: 1rem solid rgb(187, 175, 0);
+  padding: 1rem;
+}
+
+.tabelaFinanceiro {
+  width: 100%;
+}
+.dinheiroFormatado {
+  all: unset;
+  box-sizing: border-box;
+  font-weight: bold;
+}

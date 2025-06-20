@@ -7,20 +7,24 @@ import { Link } from "react-router-dom";
 import SelectBox from "../../components/SelectBox";
 import Tabela from "../../components/Tabela";
 import axios from "axios";
-import styles from "./NotaFinanceiro.module.css";
-import { useNavigate } from "react-router-dom";
+import styles from "./HistoricoPag.module.css";
+import { useLocation } from "react-router-dom";
 
-export default function NotaFinanceiro() {
-  const navigate = useNavigate();
+export default function HistoricoPag() {
+  const location = useLocation();
+  const idNota = location.state?.idNota;
+  const idCliente = location.state?.idCliente;
+  const nomeCliente = location.state?.nomeCliente;
+  const [txtId, setTxtId] = useState();
+  const [txtCliente, setTxtCliente] = useState();
   const columns = [
-    { field: "id", headerName: "ID Nota", width: 70 },
+    { field: "idNota", headerName: "ID Nota", width: 70 },
     {
-      field: "idPagamento",
-      headerName: "ID Pagamento Ultimo Pagamento",
+      field: "id", // esse id agora representa o pagamento
+      headerName: "ID Pagamento",
       width: 70,
     },
     { field: "dataEmissao", headerName: "Data de Emissão", width: 150 },
-    { field: "nomeCliente", headerName: "Nome Cliente", width: 170 },
     {
       field: "valorTotal",
       headerName: "Valor Nota",
@@ -36,12 +40,12 @@ export default function NotaFinanceiro() {
     },
     {
       field: "ultimoPagamentoData",
-      headerName: "Data Ultimo Pagamento",
+      headerName: "Data Do Pagamento",
       width: 150,
     },
     {
       field: "valorPag",
-      headerName: "Valor Ultimo Pagamento",
+      headerName: "Valor Do Pagamento",
       width: 130,
       renderCell: (params) => (
         <DinheiroInput
@@ -54,7 +58,7 @@ export default function NotaFinanceiro() {
     },
     {
       field: "resto",
-      headerName: "Valor Restante",
+      headerName: "Valor Restante No Momento",
       width: 130,
       renderCell: (params) => (
         <DinheiroInput
@@ -106,6 +110,8 @@ export default function NotaFinanceiro() {
   const [clientes, setClientes] = useState([]);
   const [notasSortadas, setNotasSortadas] = useState([]);
 
+  // /aquiroberto
+
   useEffect(() => {
     const fetchClientes = async () => {
       try {
@@ -128,45 +134,40 @@ export default function NotaFinanceiro() {
   }, []);
 
   useEffect(() => {
-    if (!clienteSelecionado) return;
+    if (!idCliente) return;
 
     const fetchNotas = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_KEY}/pagamentos/sortado/${
-            clienteSelecionado.value
-          }`
+          `${import.meta.env.VITE_BACKEND_KEY}/pagamentos/sortado/${idCliente}`
         );
         const data = res.data;
-        const mapNotas = new Map();
 
-        data.forEach((item) => {
-          const atual = mapNotas.get(item.idNota);
-          if (!atual || item.valorRestanteDebito < atual.valorRestanteDebito) {
-            mapNotas.set(item.idNota, item);
-          }
-        });
+        const payloadFiltrado = data
+          .filter((item) => !idNota || item.idNota === idNota)
+          .map((item) => ({
+            id: item.idPagamento,
+            idNota: item.idNota,
+            dataEmissao: item.dataNota,
+            nomeCliente: item.nomeCliente,
+            valorTotal: item.valorDebito,
+            ultimoPagamentoData: item.dataPagamento,
+            valorPag: item.valorPago,
+            situacao: item.situacao,
+            resto: item.valorRestanteDebito,
+          }));
 
-        const payload = Array.from(mapNotas.values()).map((item) => ({
-          id: item.idNota,
-          idPagamento: item.idPagamento,
-          dataEmissao: item.dataNota,
-          nomeCliente: item.nomeCliente,
-          valorTotal: item.valorDebito,
-          ultimoPagamentoData: item.dataPagamento,
-          valorPag: item.valorPago,
-          situacao: item.situacao,
-          resto: item.valorRestanteDebito,
-        }));
-
-        setNotasSortadas(payload);
+        setNotasSortadas(payloadFiltrado);
+        setTxtId(idNota);
+        setTxtCliente(nomeCliente);
+        console.log(txtCliente);
       } catch (err) {
         console.log(err);
       }
     };
 
     fetchNotas();
-  }, [clienteSelecionado]);
+  }, [idCliente, idNota, nomeCliente]);
 
   return (
     <>
@@ -174,29 +175,15 @@ export default function NotaFinanceiro() {
       <div className={styles.bordaVerde}>
         <Container>
           <Link to={"/notas"}>Clique para voltar a visualização de notas</Link>
-          <h1 style={{ color: "green" }}>Modo Financeiro</h1>
-          <SelectBox
-            options={clientes}
-            isSearchable={true}
-            onChange={setClienteSelecionado}
-            value={clienteSelecionado}
-            placeholder="Clique para pesquisar o cliente"
-          />
+          <h1 style={{ color: "saddlebrown" }}>
+            Visualizando Pagamentos Por Nota
+          </h1>
+          <label htmlFor="">Mostrando nota ID: {txtId}</label>
+          <label htmlFor="">do cliente: {txtCliente}</label>
           <Tabela
             className={styles.tabelaFinanceiro}
             columns={columns}
             rows={notasSortadas}
-            onRowClick={(params) => {
-              console.log("ID da nota:", params.row.id);
-              console.log("nome cliente:", clienteSelecionado.label);
-              navigate("/historico-pag", {
-                state: {
-                  idNota: params.row.id,
-                  idCliente: clienteSelecionado.value,
-                  nomeCliente: clienteSelecionado.label,
-                },
-              });
-            }}
           />
         </Container>
       </div>

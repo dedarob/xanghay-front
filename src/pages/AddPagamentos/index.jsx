@@ -1,20 +1,24 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import Header from "../../components/Header";
 import Container from "../../components/Container";
-import styles from "./AddPagamentos.module.css";
 import { Controller } from "react-hook-form";
+import DinheiroInput from "../../components/DinheiroInput";
+import { FaInfo } from "react-icons/fa";
+import Header from "../../components/Header";
 import { IoIosSave } from "react-icons/io";
 import SelectBox from "../../components/SelectBox";
 import axios from "axios";
-import DinheiroInput from "../../components/DinheiroInput";
-import { FaInfo } from "react-icons/fa";
+import styles from "./AddPagamentos.module.css";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 export default function AddPagamentos() {
   const { handleSubmit, control, register } = useForm();
   const [comboBox, setComboBox] = useState([]);
   const onSubmit = (data) => {
+    const confirmacao = window.confirm(
+      "Tem certeza que deseja adicionar o pagamento?"
+    );
+    if (!confirmacao) return alert("Pagamento cancelado");
     const hoje = new Date();
     const yyyy = hoje.getFullYear();
     const mm = String(hoje.getMonth() + 1).padStart(2, "0");

@@ -117,7 +117,12 @@ function VerClientes() {
             }
           />
           <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
+              onSubmit={handleSubmit(onSubmit)}
+            >
               {Object.entries(formValues).map(([key, value]) => {
                 if (key === "id") return null;
 

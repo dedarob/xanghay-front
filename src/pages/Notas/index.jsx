@@ -10,6 +10,7 @@ import axios from "axios";
 import styles from "./Notas.module.css";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
 
 function Notas() {
   const navigate = useNavigate();
@@ -19,7 +20,14 @@ function Notas() {
 
   const columns = [
     { field: "id", headerName: "ID Nota", width: 100 },
-    { field: "dataEmissao", headerName: "Data de Emissão", width: 180 },
+    {
+      field: "dataEmissao",
+      headerName: "Data de Emissão",
+      width: 180,
+      renderCell: (params) => (
+        <span>{formatarDataBrasileira(params.value)}</span>
+      ),
+    },
     { field: "idCliente", headerName: "ID Cliente", width: 120 },
     { field: "nomeCliente", headerName: "Nome Cliente", width: 200 },
     {

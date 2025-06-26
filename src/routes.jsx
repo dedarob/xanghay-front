@@ -10,6 +10,8 @@ import NotaFinanceiro from "./pages/NotaFinanceiro";
 import Notas from "./pages/Notas";
 import RegistroCliente from "./pages/RegistroCliente";
 import VerClientes from "./pages/VerClientes";
+import VerBoletos from "./pages/VerBoletos";
+import EditarBoletos from "./pages/EditarBoletos";
 
 function AppRoutes() {
   return (
@@ -24,6 +26,8 @@ function AppRoutes() {
       <Route path="/nota-fin" element={<NotaFinanceiro />} />
       <Route path="/historico-pag" element={<HistoricoPag />} />
       <Route path="/add-boleto" element={<AddBoletos />} />
+      <Route path="/ver-boleto" element={<VerBoletos />} />
+      <Route path="/editar-boleto/:idBoleto" element={<EditarBoletos />} />
     </Routes>
   );
 }

@@ -5,6 +5,7 @@
 
 .tabelaFinanceiro {
   width: 100%;
+  border: 1rem solid rgb(99, 48, 218);
 }
 .dinheiroFormatado {
   all: unset;

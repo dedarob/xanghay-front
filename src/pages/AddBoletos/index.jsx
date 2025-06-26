@@ -6,16 +6,49 @@ import Header from "../../components/Header";
 import { IoIosSave } from "react-icons/io";
 import styles from "./AddBoletos.module.css";
 import { useRef } from "react";
+import axios from "axios";
 
 export default function AddBoletos() {
   const { register, handleSubmit, control } = useForm();
-
+  const inputRef = useRef();
   const onSubmit = (data) => {
-    // Como anexo é file, vamos extrair só o nome para simplificar no console
+    const formData = new FormData();
+
+    const boletoDTO = {
+      descricao: data.descricao,
+      dataVencimento: data.data_vencimento,
+      situacao: data.situacao,
+      valor: data.valor,
+      observacoes: data.observacoes,
+      dataPagamento: null,
+      banco: null,
+    };
+
+    formData.append(
+      "boleto",
+      new Blob([JSON.stringify(boletoDTO)], {
+        type: "application/json",
+      })
+    );
+
     if (data.anexo && data.anexo.length > 0) {
-      data.anexo = data.anexo[0].name;
+      formData.append("anexo", data.anexo[0]);
     }
-    console.log("Dados do boleto:", data);
+
+    axios
+      .post(`${import.meta.env.VITE_BACKEND_KEY}/boletos`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        alert("Boleto registrado com sucesso");
+        console.log("Resposta do servidor:", response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao enviar pagamento:", error.message);
+        alert("Erro ao enviar boleto");
+      });
   };
 
   return (
@@ -60,8 +93,6 @@ export default function AddBoletos() {
               name="anexo"
               control={control}
               render={({ field }) => {
-                const inputRef = useRef();
-
                 return (
                   <>
                     <input

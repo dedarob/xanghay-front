@@ -110,7 +110,7 @@ function ItensNota() {
       .then((response) => {
         {
           console.log(data);
-          alert("Registro realizado com sucesso!");
+          alert("Item registrado com sucesso!");
           console.log("oq foi submitado" + response.data);
           navigate("/");
         }
@@ -180,6 +180,9 @@ function ItensNota() {
       />
       <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
         <form
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
           onSubmit={handleSubmitEdit((data) => {
             onSubmit(data);
           })}
@@ -206,6 +209,9 @@ function ItensNota() {
         onFechar={() => setEstadoModalAdicionar(false)}
       >
         <form
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
           onSubmit={handleSubmitAdd((data) => {
             onAddSubmit(data);
           })}

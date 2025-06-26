@@ -9,6 +9,7 @@ import Tabela from "../../components/Tabela";
 import axios from "axios";
 import styles from "./NotaFinanceiro.module.css";
 import { useNavigate } from "react-router-dom";
+import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
 
 export default function NotaFinanceiro() {
   const navigate = useNavigate();
@@ -19,7 +20,14 @@ export default function NotaFinanceiro() {
       headerName: "ID Pagamento Ultimo Pagamento",
       width: 70,
     },
-    { field: "dataEmissao", headerName: "Data de Emissão", width: 150 },
+    {
+      field: "dataEmissao",
+      headerName: "Data de Emissão",
+      width: 150,
+      renderCell: (params) => (
+        <span>{formatarDataBrasileira(params.value)}</span>
+      ),
+    },
     { field: "nomeCliente", headerName: "Nome Cliente", width: 170 },
     {
       field: "valorTotal",
@@ -38,6 +46,9 @@ export default function NotaFinanceiro() {
       field: "ultimoPagamentoData",
       headerName: "Data Ultimo Pagamento",
       width: 150,
+      renderCell: (params) => (
+        <span>{formatarDataBrasileira(params.value)}</span>
+      ),
     },
     {
       field: "valorPag",

@@ -9,6 +9,7 @@ import Tabela from "../../components/Tabela";
 import axios from "axios";
 import styles from "./HistoricoPag.module.css";
 import { useLocation } from "react-router-dom";
+import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
 
 export default function HistoricoPag() {
   const location = useLocation();
@@ -24,7 +25,14 @@ export default function HistoricoPag() {
       headerName: "ID Pagamento",
       width: 70,
     },
-    { field: "dataEmissao", headerName: "Data de Emissão", width: 150 },
+    {
+      field: "dataEmissao",
+      headerName: "Data de Emissão",
+      width: 150,
+      renderCell: (params) => (
+        <span>{formatarDataBrasileira(params.value)}</span>
+      ),
+    },
     {
       field: "valorTotal",
       headerName: "Valor Nota",
@@ -42,6 +50,9 @@ export default function HistoricoPag() {
       field: "ultimoPagamentoData",
       headerName: "Data Do Pagamento",
       width: 150,
+      renderCell: (params) => (
+        <span>{formatarDataBrasileira(params.value)}</span>
+      ),
     },
     {
       field: "valorPag",

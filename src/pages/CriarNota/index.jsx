@@ -68,6 +68,7 @@ function CriarNota() {
       .then((response) => {
         console.log("backend request resultado", response.data);
         alert("Registro realizado com sucesso!");
+        navigate("/ver-boleto");
 
         console.log(payload);
       })

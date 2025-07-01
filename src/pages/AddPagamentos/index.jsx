@@ -10,8 +10,10 @@ import styles from "./AddPagamentos.module.css";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AddPagamentos() {
+  const navigate = useNavigate();
   const { handleSubmit, control, register } = useForm();
   const [comboBox, setComboBox] = useState([]);
   const onSubmit = (data) => {
@@ -50,6 +52,7 @@ export default function AddPagamentos() {
       )
       .then((response) => {
         alert("Pagamento registrado com sucesso");
+        navigate("/");
         console.log("Resposta do servidor:", response.data);
       })
       .catch((error) => {

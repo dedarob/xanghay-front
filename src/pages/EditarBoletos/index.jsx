@@ -4,13 +4,12 @@ import DinheiroInput from "../../components/DinheiroInput";
 import Header from "../../components/Header";
 import { IoIosSave } from "react-icons/io";
 import styles from "./EditarBoletos.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 export default function EditarBoletos() {
   const { register, handleSubmit, control, setValue } = useForm();
-  const inputRef = useRef();
   const [dadosFormulario, setDadosFormulario] = useState(null);
   const { idBoleto } = useParams();
 
@@ -31,8 +30,6 @@ export default function EditarBoletos() {
   }, [idBoleto, setValue]);
 
   const onSubmit = (data) => {
-    const formData = new FormData();
-
     const boletoDTO = {
       descricao: data.descricao,
       dataVencimento: data.dataVencimento,
@@ -43,53 +40,15 @@ export default function EditarBoletos() {
       banco: data.banco,
     };
 
-    formData.append(
-      "boleto",
-      new Blob([JSON.stringify(boletoDTO)], {
-        type: "application/json",
-      })
-    );
-
-    if (data.anexo && data.anexo.length > 0) {
-      formData.append("anexo", data.anexo[0]);
-    }
-
     axios
-      .put(`${import.meta.env.VITE_BACKEND_KEY}/boletos/${idBoleto}`, formData)
+      .put(`${import.meta.env.VITE_BACKEND_KEY}/boletos/${idBoleto}`, boletoDTO)
       .then((res) => {
         console.log("Atualizado com sucesso", res.data);
+        alert("Boleto alterado com sucesso");
       })
       .catch((err) => {
         console.error("Erro ao atualizar boleto", err);
-      });
-  };
-
-  const baixarAnexo = () => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_KEY}/boletos/anexo/${idBoleto}`, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        const disposition = res.headers["content-disposition"];
-        let filename = `boleto_${idBoleto}.pdf`;
-        if (disposition && disposition.includes("filename=")) {
-          filename = disposition
-            .split("filename=")[1]
-            .replaceAll('"', "")
-            .trim();
-        }
-
-        const blob = new Blob([res.data], { type: "application/pdf" });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filename);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      })
-      .catch((err) => {
-        console.error("Erro ao baixar anexo", err);
+        alert("Erro ao alterar boleto");
       });
   };
 
@@ -130,54 +89,6 @@ export default function EditarBoletos() {
                   value={field.value}
                   onValueChange={field.onChange}
                 />
-              )}
-            />
-
-            <label>Anexo</label>
-            <Controller
-              name="anexo"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="file"
-                    style={{ display: "none" }}
-                    ref={(e) => {
-                      inputRef.current = e;
-                      field.ref(e);
-                    }}
-                    onChange={(e) => field.onChange(e.target.files)}
-                  />
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "1rem",
-                      alignItems: "center",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        inputRef.current && inputRef.current.click()
-                      }
-                      className={styles.botaoAnexo}
-                    >
-                      Enviar novo anexo
-                    </button>
-                    <button
-                      type="button"
-                      onClick={baixarAnexo}
-                      className={styles.botaoAnexo}
-                    >
-                      Baixar anexo atual
-                    </button>
-                  </div>
-                  {field.value && field.value.length > 0 && (
-                    <span style={{ marginLeft: 10 }}>
-                      {field.value[0].name}
-                    </span>
-                  )}
-                </>
               )}
             />
 

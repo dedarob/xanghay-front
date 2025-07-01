@@ -31,5 +31,6 @@ export function fetch(data, navigate) {
 
     .catch((error) => {
       console.log(error.message);
+      alert("Erro ao registrar cliente");
     });
 }

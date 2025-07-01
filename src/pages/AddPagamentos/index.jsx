@@ -57,6 +57,7 @@ export default function AddPagamentos() {
       })
       .catch((error) => {
         console.error("Erro ao enviar pagamento:", error.message);
+        alert("Erro ao registar pagamento");
       });
   };
 

@@ -10,6 +10,7 @@ import Container from "../../components/Container";
 import SelectBox from "../../components/SelectBox";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { IoIosSave } from "react-icons/io";
 
 function CriarNota() {
   const apiPath = "/cliente";
@@ -74,6 +75,7 @@ function CriarNota() {
       })
       .catch((error) => {
         console.log("erro no fetch de insercao de notas", error.message);
+        alert("Erro ao criar notas");
       });
   };
 
@@ -158,7 +160,7 @@ function CriarNota() {
               )}
             />
             <button type="submit" className={styles.botaoGerarNota}>
-              <PiFilePdf />
+              <IoIosSave />
             </button>
           </div>
         </form>

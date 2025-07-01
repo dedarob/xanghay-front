@@ -110,7 +110,7 @@ function ItensNota() {
       .then((response) => {
         {
           console.log(data);
-          alert("Item registrado com sucesso!");
+          alert("Item modificado com sucesso!");
           console.log("oq foi submitado" + response.data);
           navigate("/");
         }
@@ -118,6 +118,7 @@ function ItensNota() {
 
       .catch((error) => {
         console.log(error.message);
+        alert("Erro ao modificar item");
       });
   };
   const onAddSubmit = (data) => {
@@ -138,6 +139,7 @@ function ItensNota() {
 
       .catch((error) => {
         console.log(error.message);
+        alert("Erro ao adicionar item");
       });
   };
   const dadosDoResetDeAdd = {
@@ -156,7 +158,10 @@ function ItensNota() {
         setModalDeleteConfirm(false);
         buscarItensPorNota();
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        console.log(error.message);
+        alert("Erro ao apagar item");
+      });
   };
 
   return (

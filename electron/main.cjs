@@ -1,6 +1,8 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
+app.disableHardwareAcceleration();
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -9,7 +11,7 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-
+  win.webContents.openDevTools();
   win.loadURL("http://localhost:5173"); // URL onde o Vite vai rodar
 }
 

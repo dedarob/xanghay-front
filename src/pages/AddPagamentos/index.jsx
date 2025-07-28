@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import Container from "../../components/Container";
 import { Controller } from "react-hook-form";
 import DinheiroInput from "../../components/DinheiroInput";
@@ -7,25 +9,31 @@ import { IoIosSave } from "react-icons/io";
 import SelectBox from "../../components/SelectBox";
 import axios from "axios";
 import styles from "./AddPagamentos.module.css";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AddPagamentos() {
   const navigate = useNavigate();
-  const { handleSubmit, control, register } = useForm();
+  const { handleSubmit, control, register, watch } = useForm();
   const [comboBox, setComboBox] = useState([]);
+  const [metodoPag, setMetodoPag] = useState();
+  useEffect(() => {
+    console.log(metodoPag);
+  }, [metodoPag]);
+  const metodosDePagamento = [
+    { value: "pix", label: "Pix" },
+    { value: "dinheiro", label: "Dinheiro" },
+    { value: "debito", label: "Débito" },
+    { value: "credito", label: "Crédito" },
+  ];
+  const apiPath = "/cliente";
+
   const onSubmit = (data) => {
     const confirmacao = window.confirm(
       "Tem certeza que deseja adicionar o pagamento?"
     );
     if (!confirmacao) return alert("Pagamento cancelado");
-    const hoje = new Date();
-    const yyyy = hoje.getFullYear();
-    const mm = String(hoje.getMonth() + 1).padStart(2, "0");
-    const dd = String(hoje.getDate()).padStart(2, "0");
-    const dataLocal = `${yyyy}-${mm}-${dd}`;
+
     let valorPago = data.vlrPagamento;
 
     if (typeof valorPago === "string") {
@@ -60,17 +68,6 @@ export default function AddPagamentos() {
       });
   };
 
-  const [metodoPag, setMetodoPag] = useState();
-  useEffect(() => {
-    console.log(metodoPag);
-  }, [metodoPag]);
-  const metodosDePagamento = [
-    { value: "pix", label: "Pix" },
-    { value: "dinheiro", label: "Dinheiro" },
-    { value: "debito", label: "Débito" },
-    { value: "credito", label: "Crédito" },
-  ];
-  const apiPath = "/cliente";
   useEffect(() => {
     const fetchComboBoxData = () => {
       axios
@@ -91,14 +88,15 @@ export default function AddPagamentos() {
     };
     fetchComboBoxData();
   }, []);
+
   return (
     <>
       <Header />
       <Container>
-        <div className={styles.areaFormPagamentos}>
+        <div className={styles.areaFormCliente}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className={styles.formPagamentos}
+            className={styles.formCliente}
           >
             <label htmlFor=""> Nome do Cliente </label>
             <Controller

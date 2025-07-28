@@ -1,11 +1,11 @@
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import Container from "../../components/Container";
 import DinheiroInput from "../../components/DinheiroInput";
 import Header from "../../components/Header";
 import { IoIosSave } from "react-icons/io";
-import styles from "./AddBoletos.module.css";
 import axios from "axios";
+import styles from "./AddBoletos.module.css";
 import { useNavigate } from "react-router-dom";
 
 export default function AddBoletos() {
@@ -13,28 +13,23 @@ export default function AddBoletos() {
   const { register, handleSubmit, control } = useForm();
 
   const onSubmit = (data) => {
-    const boletoDTO = {
+    const payload = {
       descricao: data.descricao,
       dataVencimento: data.data_vencimento,
       situacao: data.situacao,
       valor: data.valor,
       observacoes: data.observacoes,
-      dataPagamento: null,
-      banco: null,
     };
 
     axios
-      .post(`${import.meta.env.VITE_BACKEND_KEY}/boletos`, boletoDTO, {
-        headers: { "Content-Type": "application/json" },
-      })
+      .post(import.meta.env.VITE_BACKEND_KEY + "/boletos", payload)
       .then((response) => {
-        alert("Boleto registrado com sucesso");
+        alert("Boleto registrado com sucesso!");
         navigate("/ver-boleto");
         console.log("Resposta do servidor:", response.data);
       })
       .catch((error) => {
         console.error("Erro ao enviar boleto:", error.message);
-        alert("Erro ao enviar boleto");
       });
   };
 
@@ -66,7 +61,7 @@ export default function AddBoletos() {
             <label>Valor</label>
             <Controller
               control={control}
-              name="valor"
+              name={"valor"}
               render={({ field }) => (
                 <DinheiroInput
                   value={field.value}

@@ -1,5 +1,5 @@
-import styles from "./TelefoneInput.module.css";
 import { PatternFormat } from "react-number-format";
+import styles from "./TelefoneInput.module.css";
 
 function TelefoneInput({
   value,

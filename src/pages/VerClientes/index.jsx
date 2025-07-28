@@ -1,14 +1,15 @@
-import styles from "./VerClientes.module.css";
-import Header from "../../components/Header";
-import Tabela from "../../components/Tabela";
-import Container from "../../components/Container";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import TelefoneInput from "../../components/TelefoneInput";
-import { useNavigate } from "react-router-dom";
-import Modal from "../../components/Modal";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
+import Container from "../../components/Container";
+import Header from "../../components/Header";
+import Modal from "../../components/Modal";
+import Tabela from "../../components/Tabela";
+import TelefoneInput from "../../components/TelefoneInput";
+import axios from "axios";
+import styles from "./VerClientes.module.css";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 function VerClientes() {
   const navigate = useNavigate();
@@ -17,51 +18,40 @@ function VerClientes() {
   const [estadoModal, setEstadoModal] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [modalDeleteConfirm, setModalDeleteConfirm] = useState(false);
+
   const abrirModalDelete = () => {
     setModalDeleteConfirm(true);
     gerarCodigoConfirmacao();
   };
 
   const { register, handleSubmit, setValue, watch, reset } = useForm();
-  const buscarClientes = () => {
-    axios
-      .get(import.meta.env.VITE_BACKEND_KEY + apiPath)
-      .then((response) => setClientes(response.data))
-      .catch((error) => console.log(error.message));
+
+  const buscarClientes = async () => {
+    try {
+      const response = await axios.get(
+        import.meta.env.VITE_BACKEND_KEY + apiPath
+      );
+      setClientes(response.data);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
+
   useEffect(() => {
     buscarClientes();
   }, []);
 
-  const columns = [
-    { field: "id", headerName: "Identificador Cliente", width: 150 },
-    { field: "nomeCliente", headerName: "Nome do Cliente", width: 290 },
-    { field: "cidadeCliente", headerName: "Cidade", width: 150 },
-    { field: "enderecoCliente", headerName: "Endereço", width: 280 },
-    {
-      field: "telefoneCliente",
-      headerName: "Telefone",
-      width: 180,
-      renderCell: (params) => (
-        <TelefoneInput
-          className={styles.telefoneFormatado}
-          value={params.value}
-          onValueChange={() => {}}
-          disabled={true}
-        />
-      ),
-    },
-  ];
-
-  const handleRowClick = (params) => {
-    setSelectedRowId(params.id);
-    reset(params.row);
+  const onRowClick = (params) => {
+    setSelectedRowId(params.row.id);
+    setValue("nomeCliente", params.row.nomeCliente);
+    setValue("cidadeCliente", params.row.cidadeCliente);
+    setValue("enderecoCliente", params.row.enderecoCliente);
+    setValue("telefoneCliente", params.row.telefoneCliente);
+    setEstadoModal(true);
   };
 
   const onSubmit = (data) => {
-    console.log("pra salvar:", data);
     const payload = {
-      id: data.id,
       nomeCliente: data.nomeCliente,
       cidadeCliente: data.cidadeCliente,
       enderecoCliente: data.enderecoCliente,
@@ -73,90 +63,104 @@ function VerClientes() {
         `${import.meta.env.VITE_BACKEND_KEY}/cliente/${selectedRowId}`,
         payload
       )
-      .then((res) => {
-        console.log(res.data),
-          console.log(payload),
-          alert("Cliente editado com sucesso");
+      .then((response) => {
+        alert("Cliente atualizado com sucesso!");
+        setEstadoModal(false);
         buscarClientes();
+        console.log("Resposta do servidor:", response.data);
       })
-      .catch((err) => console.log(err));
-    setEstadoModal(false);
+      .catch((error) => {
+        console.error("Erro ao atualizar cliente:", error.message);
+      });
   };
-  const formValues = watch();
-  const deletarCliente = () => {
+
+  const deletarCliente = (id, nome) => {
     axios
-      .delete(`${import.meta.env.VITE_BACKEND_KEY}/cliente/${selectedRowId}`)
-      .then(() => {
-        alert(`Cliente "${formValues.nomeCliente}" excluído com sucesso`);
-        setModalDeleteConfirm(false);
+      .delete(`${import.meta.env.VITE_BACKEND_KEY}/cliente/${id}`)
+      .then((response) => {
+        alert(`Cliente "${nome}" deletado com sucesso!`);
         buscarClientes();
+        console.log("Resposta do servidor:", response.data);
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        console.error("Erro ao deletar cliente:", error.message);
+      });
   };
-  const mensagemDelete = `Tem certeza que deseja apagar o cliente: ${formValues.nomeCliente}?`;
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "nomeCliente", headerName: "Nome", width: 200 },
+    { field: "cidadeCliente", headerName: "Cidade", width: 150 },
+    { field: "enderecoCliente", headerName: "Endereço", width: 250 },
+    { field: "telefoneCliente", headerName: "Telefone", width: 150 },
+  ];
+
+  const mensagemDeleteVar = `Tem certeza que deseja deletar o cliente "${watch(
+    "nomeCliente"
+  )}"?`;
+
   return (
     <>
       <Header />
       <Container>
-        <div className={styles.viewVerClientes}>
+        <div className={styles.areaTabela}>
           <Tabela
             columns={columns}
             rows={clientes}
-            onAddClick={() => navigate("/registro-cliente")}
-            onEditClick={() => setEstadoModal(true)}
-            onDeleteClick={() => {
-              if (formValues.nomeCliente) {
-                abrirModalDelete();
-              } else {
-                alert("Selecione um cliente");
-              }
-            }}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.id === selectedRowId ? styles.selectedRow : ""
-            }
-          />
-          <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
-            <form
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.preventDefault();
-              }}
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              {Object.entries(formValues).map(([key, value]) => {
-                if (key === "id") return null;
-
-                return (
-                  <div key={key} className={styles.modalInputGroup}>
-                    <label htmlFor={key}>{key}</label>
-                    {key === "telefoneCliente" ? (
-                      <TelefoneInput
-                        id={key}
-                        value={value}
-                        onValueChange={(val) => setValue(key, val)}
-                      />
-                    ) : (
-                      <input id={key} type="text" {...register(key)} />
-                    )}
-                  </div>
-                );
-              })}
-
-              <button type="submit" className={styles.botaoModal}>
-                Salvar
-              </button>
-            </form>
-          </Modal>
-          <ConfirmDeleteModal
-            aberto={modalDeleteConfirm}
-            onFechar={() => setModalDeleteConfirm(false)}
-            headerMessage={mensagemDelete}
-            onConfirmarDelete={() => {
-              deletarCliente();
-              setModalDeleteConfirm(false);
-            }}
+            onRowClick={onRowClick}
+            onDeleteClick={abrirModalDelete}
           />
         </div>
+
+        <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <h2>Editar Cliente</h2>
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="nomeCliente">Nome</label>
+              <input
+                id="nomeCliente"
+                type="text"
+                {...register("nomeCliente")}
+              />
+            </div>
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="cidadeCliente">Cidade</label>
+              <input
+                id="cidadeCliente"
+                type="text"
+                {...register("cidadeCliente")}
+              />
+            </div>
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="enderecoCliente">Endereço</label>
+              <input
+                id="enderecoCliente"
+                type="text"
+                {...register("enderecoCliente")}
+              />
+            </div>
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="telefoneCliente">Telefone</label>
+              <TelefoneInput
+                value={watch("telefoneCliente")}
+                onValueChange={(value) => setValue("telefoneCliente", value)}
+              />
+            </div>
+            <button type="submit" className={styles.botaoModal}>
+              Salvar
+            </button>
+          </form>
+        </Modal>
+
+        <ConfirmDeleteModal
+          aberto={modalDeleteConfirm}
+          onFechar={() => setModalDeleteConfirm(false)}
+          headerMessage={mensagemDeleteVar}
+          onConfirmarDelete={() => {
+            deletarCliente(selectedRowId, watch("nomeCliente"));
+            setModalDeleteConfirm(false);
+          }}
+        />
       </Container>
     </>
   );

@@ -1,19 +1,21 @@
-import { useForm, Controller } from "react-hook-form";
-import styles from "./RegistroCliente.module.css";
-import Header from "../../components/Header";
-import TelefoneInput from "../../components/TelefoneInput";
-import { IoIosSave } from "react-icons/io";
-import { CgController } from "react-icons/cg";
+import { Controller, useForm } from "react-hook-form";
+
 import Container from "../../components/Container";
+import Header from "../../components/Header";
+import { IoIosSave } from "react-icons/io";
+import TelefoneInput from "../../components/TelefoneInput";
 import { fetch } from "./service";
+import styles from "./RegistroCliente.module.css";
 import { useNavigate } from "react-router-dom";
 
-function RegistroCliente() {
+export default function RegistroCliente() {
   const navigate = useNavigate();
   const { register, handleSubmit, control } = useForm();
+
   const onSubmit = (data) => {
     fetch(data, navigate);
   };
+
   return (
     <>
       <Header />
@@ -56,4 +58,3 @@ function RegistroCliente() {
     </>
   );
 }
-export default RegistroCliente;

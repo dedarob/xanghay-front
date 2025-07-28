@@ -1,14 +1,15 @@
-import styles from "./CriarNota.module.css";
-import Header from "../../components/Header";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import FormDinamico from "../../components/FormDinamico";
-import { PiFilePdf } from "react-icons/pi";
-import { useState, useEffect } from "react";
+
+import Container from "../../components/Container";
 import { Controller } from "react-hook-form";
 import DinheiroInput from "../../components/DinheiroInput";
-import Container from "../../components/Container";
+import FormDinamico from "../../components/FormDinamico";
+import Header from "../../components/Header";
+import { PiFilePdf } from "react-icons/pi";
 import SelectBox from "../../components/SelectBox";
 import axios from "axios";
+import styles from "./CriarNota.module.css";
 import { useNavigate } from "react-router-dom";
 
 function CriarNota() {
@@ -43,9 +44,9 @@ function CriarNota() {
           console.log(error.message);
         });
     };
-
     fetchComboBoxData();
   }, []);
+
   const onSubmit = (data) => {
     console.log("Form Data (raw JSON):", JSON.stringify(data, null, 2));
     setFormData(data);
@@ -81,19 +82,33 @@ function CriarNota() {
     if (!arrayNotaAtt || !Array.isArray(arrayNotaAtt)) return;
 
     let totalGeral = 0;
+    let needsUpdate = false;
+
     arrayNotaAtt.forEach((item, i) => {
       const totalItem = (item?.valorUni || 0) * (item?.quantidade || 0);
-      if (item?.valorTotal !== totalItem) {
-        setValue(`arrayNota.${i}.valorTotal`, totalItem, { shouldDirty: true });
-      }
       totalGeral += totalItem;
+
+      if (item?.valorTotal !== totalItem) {
+        // Atualiza apenas se valor mudou de verdade
+        needsUpdate = true;
+      }
     });
 
     if (moneySum !== totalGeral) {
       setMoneySum(totalGeral);
       setValue("totalGeral", totalGeral, { shouldDirty: true });
     }
-  }, [arrayNotaAtt, setValue, moneySum]);
+
+    // Se não houver nenhuma mudança necessária, não faz nada
+    if (!needsUpdate) return;
+
+    arrayNotaAtt.forEach((item, i) => {
+      const totalItem = (item?.valorUni || 0) * (item?.quantidade || 0);
+      if (item?.valorTotal !== totalItem) {
+        setValue(`arrayNota.${i}.valorTotal`, totalItem, { shouldDirty: true });
+      }
+    });
+  }, [JSON.stringify(arrayNotaAtt)]); // comparação profunda
 
   return (
     <>
@@ -109,13 +124,11 @@ function CriarNota() {
         >
           <div className={styles.areaDadosCliente}>
             <label htmlFor="nomeCliente">Nome do Cliente</label>
-
             <Controller
               control={control}
-              name={"cliente"}
+              name="cliente"
               render={({ field }) => (
                 <SelectBox
-                  className={styles.preencherDadosCliente}
                   options={comboBox}
                   isSearchable={isSearchable}
                   onChange={(selected) => {
@@ -127,15 +140,16 @@ function CriarNota() {
               )}
             />
           </div>
-          <div>
-            <table className={styles.tabela_criar_nota}>
-              <thead className={styles.thead_criar_nota}>
-                <tr className={styles.tr_criar_nota}>
-                  <th className={styles.th_criar_nota}>Quantidade</th>
-                  <th className={styles.th_criar_nota}>Produto/Serviço</th>
-                  <th className={styles.th_criar_nota}>Valor Unitário</th>
-                  <th className={styles.th_criar_nota}>Valor Total</th>
-                  <th className={styles.th_criar_nota}>Ação</th>
+
+          <div className={styles.areaTabela}>
+            <table className={styles.tabela}>
+              <thead>
+                <tr>
+                  <th>Quantidade</th>
+                  <th>Produto</th>
+                  <th>Valor Unitário</th>
+                  <th>Valor Total</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,21 +157,13 @@ function CriarNota() {
               </tbody>
             </table>
           </div>
-          <div className={styles.areaTotalePDF}>
-            <Controller
-              className={styles.primeiroElemento}
-              control={control}
-              name={"totalGeral"}
-              render={({ field }) => (
-                <DinheiroInput
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  disabled
-                  placeholder="Total Geral"
-                />
-              )}
-            />
-            <button type="submit" className={styles.botaoGerarNota}>
+
+          <div className={styles.areaTotal}>
+            <label>Total Geral: R$ {moneySum.toFixed(2)}</label>
+          </div>
+
+          <div className={styles.areaBotoes}>
+            <button type="submit" className={styles.botaoSave}>
               <PiFilePdf />
             </button>
           </div>

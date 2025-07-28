@@ -1,11 +1,12 @@
 import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+
 import Container from "../../components/Container";
 import DinheiroInput from "../../components/DinheiroInput";
 import Header from "../../components/Header";
 import { IoIosSave } from "react-icons/io";
-import styles from "./EditarBoletos.module.css";
-import { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "./EditarBoletos.module.css";
 import { useParams } from "react-router-dom";
 
 export default function EditarBoletos() {
@@ -13,24 +14,30 @@ export default function EditarBoletos() {
   const [dadosFormulario, setDadosFormulario] = useState(null);
   const { idBoleto } = useParams();
 
+  const fetchBoleto = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_KEY}/boletos/${idBoleto}`
+      );
+      setDadosFormulario(res.data);
+      setValue("descricao", res.data.descricao);
+      setValue("dataVencimento", res.data.dataVencimento);
+      setValue("situacao", res.data.situacao);
+      setValue("valor", res.data.valor);
+      setValue("observacoes", res.data.observacoes);
+      setValue("dataPagamento", res.data.dataPagamento);
+      setValue("banco", res.data.banco);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_KEY}/boletos/${idBoleto}`)
-      .then((res) => {
-        setDadosFormulario(res.data);
-        setValue("descricao", res.data.descricao);
-        setValue("dataVencimento", res.data.dataVencimento);
-        setValue("situacao", res.data.situacao);
-        setValue("valor", res.data.valor);
-        setValue("observacoes", res.data.observacoes);
-        setValue("dataPagamento", res.data.dataPagamento);
-        setValue("banco", res.data.banco);
-      })
-      .catch((err) => console.log(err));
-  }, [idBoleto, setValue]);
+    fetchBoleto();
+  }, []);
 
   const onSubmit = (data) => {
-    const boletoDTO = {
+    const payload = {
       descricao: data.descricao,
       dataVencimento: data.dataVencimento,
       situacao: data.situacao,
@@ -41,18 +48,16 @@ export default function EditarBoletos() {
     };
 
     axios
-      .put(`${import.meta.env.VITE_BACKEND_KEY}/boletos/${idBoleto}`, boletoDTO)
-      .then((res) => {
-        console.log("Atualizado com sucesso", res.data);
-        alert("Boleto alterado com sucesso");
+      .put(`${import.meta.env.VITE_BACKEND_KEY}/boletos/${idBoleto}`, payload)
+      .then((response) => {
+        alert("Boleto atualizado com sucesso!");
+        window.history.back();
+        console.log("Resposta do servidor:", response.data);
       })
-      .catch((err) => {
-        console.error("Erro ao atualizar boleto", err);
-        alert("Erro ao alterar boleto");
+      .catch((error) => {
+        console.error("Erro ao atualizar boleto:", error.message);
       });
   };
-
-  if (!dadosFormulario) return <p>Carregando...</p>;
 
   return (
     <>
@@ -76,8 +81,8 @@ export default function EditarBoletos() {
             <select {...register("situacao")}>
               <option value="">Selecione</option>
               <option value="pendente">Pendente</option>
-              <option value="pago">Pago</option>
               <option value="atrasado">Atrasado</option>
+              <option value="pago">Pago</option>
             </select>
 
             <label>Valor</label>

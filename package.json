@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start-app": "concurrently \"npm run dev\" \"npm run backend\" \"npm run open-browser\"",
+    "backend": "java -jar backend/casa-marmo-back.jar",
+    "open-browser": "wait-on http://localhost:5173 && start http://localhost:5173",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "electron electron/main.cjs"
+    "electron": "electron electron/main.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -34,11 +37,13 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^8.2.2",
     "electron": "^35.1.5",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "vite": "^6.3.0"
+    "vite": "^6.3.0",
+    "wait-on": "^7.2.0"
   }
 }

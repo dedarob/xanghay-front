@@ -1,15 +1,16 @@
-import { useFieldArray } from "react-hook-form";
-import styles from "./FormDinamico.module.css";
-import { FaTrash } from "react-icons/fa";
-import { HiPlusSm } from "react-icons/hi";
 import { Controller } from "react-hook-form";
 import DinheiroInput from "../DinheiroInput";
+import { FaTrash } from "react-icons/fa";
+import { HiPlusSm } from "react-icons/hi";
+import styles from "./FormDinamico.module.css";
+import { useFieldArray } from "react-hook-form";
 
 function FormDinamico({ control, register }) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "arrayNota",
   });
+
   return (
     <>
       {fields.map((field, index) => (
@@ -47,9 +48,9 @@ function FormDinamico({ control, register }) {
           </td>
           <td>
             <button
-              className={styles.botaoRemover}
               type="button"
               onClick={() => remove(index)}
+              className={styles.botaoRemove}
             >
               <FaTrash />
             </button>

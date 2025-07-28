@@ -1,5 +1,5 @@
-import styles from "./DinheiroInput.module.css";
 import { NumericFormat } from "react-number-format";
+import styles from "./DinheiroInput.module.css";
 
 function DinheiroInput({
   value,

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
 import DinheiroInput from "../../components/DinheiroInput";
 import Modal from "../../components/Modal";
@@ -5,16 +7,15 @@ import { PiSubtitlesDuotone } from "react-icons/pi";
 import Tabela from "../../components/Tabela";
 import axios from "axios";
 import styles from "./ItensNota.module.css";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { useState } from "react";
 
 function ItensNota() {
   const { idNota } = useParams();
   const [itens, setItens] = useState([]);
   const [totalNotaPorObjeto, setTotalNotaPorObjeto] = useState(0);
   const [totalNota, setTotalNota] = useState(0);
+
   function somaCadaItem(data) {
     let totalTodosItens = 0;
     const itensAtualizados = data.map((obj) => {
@@ -25,247 +26,193 @@ function ItensNota() {
     setTotalNota(totalTodosItens);
     return itensAtualizados;
   }
-  const buscarItensPorNota = () => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_KEY}/notas/itens/${idNota}`)
-      .then((res) => {
-        const itensComTotais = somaCadaItem(res.data);
-        setItens(itensComTotais);
-      })
-      .catch((err) => console.log(err));
+
+  const buscarItensPorNota = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_KEY}/notas/itens/${idNota}`
+      );
+      const itensComTotais = somaCadaItem(res.data);
+      setItens(itensComTotais);
+    } catch (err) {
+      console.log(err);
+    }
   };
+
   useEffect(() => {
     if (!idNota) return;
     buscarItensPorNota();
   }, [idNota]);
 
-  const columns = [
-    { field: "notaId", headerName: "Identificador Nota", width: 130 },
-    { field: "descricao", headerName: "Produto/Serviço", width: 290 },
-    { field: "quantidade", headerName: "Quantidade", width: 120 },
-    {
-      field: "precoUnitario",
-      headerName: "Preco Unitario",
-      width: 250,
-      renderCell: (params) => (
-        <DinheiroInput
-          className={styles.dinheiroFormatado}
-          value={params.value}
-          onValueChange={() => {}}
-          disabled={true}
-        />
-      ),
-    },
-    {
-      field: "precoTotal",
-      headerName: "Preco Total Por Item",
-      width: 250,
-      renderCell: (params) => (
-        <DinheiroInput
-          className={styles.dinheiroFormatado}
-          value={params.value}
-          onValueChange={() => {}}
-          disabled={true}
-        />
-      ),
-    },
-  ];
+  const [estadoModal, setEstadoModal] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const [modalDeleteConfirm, setModalDeleteConfirm] = useState(false);
+  const [formValues, setFormValues] = useState({});
+  const [formValuesAdd, setFormValuesAdd] = useState({});
+
   const {
     register: registerEdit,
     handleSubmit: handleSubmitEdit,
-    watch: watchEdit,
     reset: resetEdit,
   } = useForm();
-
   const {
     register: registerAdd,
     handleSubmit: handleSubmitAdd,
     reset: resetAdd,
-    watch: watchAdd,
   } = useForm();
-  const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalAdicionar, setEstadoModalAdicionar] = useState(false);
-  const [selectedRowId, setSelectedRowId] = useState(null);
-  const formValues = watchEdit();
-  const formValuesAdd = watchAdd();
-  const handleRowClick = (params) => {
-    console.log("linha clicada: ", params.row);
-    setSelectedRowId(params.id);
-    resetEdit(params.row);
-    setMensagemDeleteVar(
-      "Tem certeza que deseja deletar o item " + params.row.descricao + "?"
-    );
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "descricao", headerName: "Descrição", width: 200 },
+    { field: "quantidade", headerName: "Quantidade", width: 100 },
+    { field: "precoUnitario", headerName: "Preço Unitário", width: 130 },
+    { field: "precoTotal", headerName: "Preço Total", width: 130 },
+  ];
+
+  const onRowClick = (params) => {
+    setSelectedRowId(params.row.id);
+    setFormValues(params.row);
+    setEstadoModal(true);
   };
-  const onSubmit = (data) => {
-    console.log("submit", data);
-    //axios do put vai aqui qnd criar, n esquece de usar o usestate do row no address
+
+  const onSubmitEdit = (data) => {
+    const payload = {
+      descricao: data.descricao,
+      quantidade: data.quantidade,
+      precoUnitario: data.precoUnitario,
+    };
+
     axios
       .put(
-        `${import.meta.env.VITE_BACKEND_KEY}/notas/modificar-item/${
-          data.notaId
-        }/item/${data.id}`,
-        data
+        `${import.meta.env.VITE_BACKEND_KEY}/notas/itens/${selectedRowId}`,
+        payload
       )
-
       .then((response) => {
-        {
-          console.log(data);
-          alert("Item registrado com sucesso!");
-          console.log("oq foi submitado" + response.data);
-          navigate("/");
-        }
+        alert("Item atualizado com sucesso!");
+        setEstadoModal(false);
+        buscarItensPorNota();
+        console.log("Resposta do servidor:", response.data);
       })
-
       .catch((error) => {
-        console.log(error.message);
+        console.error("Erro ao atualizar item:", error.message);
       });
   };
-  const onAddSubmit = (data) => {
-    console.log("submit de add", data);
+
+  const onSubmitAdd = (data) => {
+    const payload = {
+      descricao: data.descricao,
+      quantidade: data.quantidade,
+      precoUnitario: data.precoUnitario,
+      notaId: idNota,
+    };
+
     axios
-      .post(
-        `${import.meta.env.VITE_BACKEND_KEY}/notas/colocar-item/${idNota}`,
-        data
-      )
-
-      .then(() => {
-        {
-          console.log(data);
-          alert("Registro realizado com sucesso!");
-          navigate("/");
-        }
+      .post(`${import.meta.env.VITE_BACKEND_KEY}/notas/itens`, payload)
+      .then((response) => {
+        alert("Item adicionado com sucesso!");
+        setEstadoModal(false);
+        buscarItensPorNota();
+        console.log("Resposta do servidor:", response.data);
       })
-
       .catch((error) => {
-        console.log(error.message);
+        console.error("Erro ao adicionar item:", error.message);
       });
   };
-  const dadosDoResetDeAdd = {
-    descricao: "",
-    quantidade: 0,
-    precoUnitario: 0,
-    precoTotal: 0,
-  };
-  const [modalDeleteConfirm, setModalDeleteConfirm] = useState(false);
-  const [mensagemDeleteVar, setMensagemDeleteVar] = useState("");
+
   const deletarItemCliente = (id, descricao) => {
     axios
-      .delete(`${import.meta.env.VITE_BACKEND_KEY}/notas/deletar-item/${id}`)
-      .then(() => {
-        alert(`Item "${descricao}" excluído com sucesso`);
-        setModalDeleteConfirm(false);
+      .delete(`${import.meta.env.VITE_BACKEND_KEY}/notas/itens/${id}`)
+      .then((response) => {
+        alert(`Item "${descricao}" deletado com sucesso!`);
         buscarItensPorNota();
+        console.log("Resposta do servidor:", response.data);
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        console.error("Erro ao deletar item:", error.message);
+      });
   };
+
+  const abrirModalDelete = () => {
+    setModalDeleteConfirm(true);
+  };
+
+  const mensagemDeleteVar = `Tem certeza que deseja deletar o item "${formValues.descricao}"?`;
 
   return (
     <>
-      <Tabela
-        columns={columns}
-        rows={itens}
-        onAddClick={() => {
-          resetAdd({ ...dadosDoResetDeAdd, notaId: idNota });
-          setEstadoModalAdicionar(true);
-        }}
-        onEditClick={() => setEstadoModal(true)}
-        onDeleteClick={() => setModalDeleteConfirm(true)}
-        onRowClick={handleRowClick}
-      />
-      <DinheiroInput
-        className={styles.dinheiroFormatado}
-        value={totalNota}
-        onValueChange={() => {}}
-        disabled={true}
-      />
-      <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
-        <form
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.preventDefault();
-          }}
-          onSubmit={handleSubmitEdit((data) => {
-            onSubmit(data);
-          })}
-        >
-          {Object.entries(formValues).map(([key, value]) => {
-            if (key === "notaId" || key === "id" || key === "precoTotal")
-              return null;
+      <Header />
+      <Container>
+        <div className={styles.areaTabela}>
+          <Tabela
+            columns={columns}
+            rows={itens}
+            onRowClick={onRowClick}
+            onDeleteClick={abrirModalDelete}
+          />
+        </div>
 
-            return (
-              <div key={key} className={styles.modalInputGroup}>
-                <label htmlFor={key}>{key}</label>
-                <input id={key} type="text" {...registerEdit(key)} />
-              </div>
-            );
-          })}
+        <div className={styles.areaTotal}>
+          <label>Total da Nota: R$ {totalNota.toFixed(2)}</label>
+        </div>
 
-          <button type="submit" className={styles.botaoModal}>
-            Salvar
-          </button>
-        </form>
-      </Modal>
-      <Modal
-        aberto={estadoModalAdicionar}
-        onFechar={() => setEstadoModalAdicionar(false)}
-      >
-        <form
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.preventDefault();
-          }}
-          onSubmit={handleSubmitAdd((data) => {
-            onAddSubmit(data);
-          })}
-        >
-          {" "}
-          <label>
-            Adicionando a nota de Identificador ({formValuesAdd.notaId})
-          </label>
-          {Object.entries(formValuesAdd).map(([key, value]) => {
-            if (key === "notaId" || key === "id" || key === "precoTotal")
-              return null;
-
-            return (
-              <div key={key} className={styles.modalInputGroup}>
-                <label htmlFor={key}>{key}</label>
-                {key === "precoUnitario" ? (
-                  <DinheiroInput
-                    value={value}
-                    onValueChange={(val) => {
-                      resetAdd({ ...formValuesAdd, [key]: val });
-                    }}
-                  />
-                ) : (
-                  <input id={key} type="text" {...registerAdd(key)} />
-                )}
-              </div>
-            );
-          })}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
+        <div className={styles.areaBotoes}>
+          <button
+            onClick={() => {
+              setFormValuesAdd({ notaId: idNota });
+              setEstadoModal(true);
             }}
+            className={styles.botaoAdd}
           >
-            <label htmlFor="">
-              Preço Total: R$
-              {formValuesAdd.precoUnitario * formValuesAdd.quantidade}
-            </label>
-            <button type="submit" className={styles.botaoModal}>
-              Salvar
-            </button>
-          </div>
-        </form>
-      </Modal>
-      <ConfirmDeleteModal
-        aberto={modalDeleteConfirm}
-        onFechar={() => setModalDeleteConfirm(false)}
-        headerMessage={mensagemDeleteVar}
-        onConfirmarDelete={() => {
-          deletarItemCliente(formValues.id, formValues.descricao);
-          setModalDeleteConfirm(false);
-        }}
-        className={styles.modalDeDeletar}
-      ></ConfirmDeleteModal>
+            <PiSubtitlesDuotone />
+          </button>
+        </div>
+
+        <Modal aberto={estadoModal} onFechar={() => setEstadoModal(false)}>
+          {selectedRowId ? (
+            <form onSubmit={handleSubmitEdit(onSubmitEdit)}>
+              <h2>Editar Item</h2>
+              {Object.keys(formValues).map((key) => {
+                if (key === "id" || key === "precoTotal") return null;
+                return (
+                  <div key={key} className={styles.modalInputGroup}>
+                    <label htmlFor={key}>{key}</label>
+                    <input id={key} type="text" {...registerEdit(key)} />
+                  </div>
+                );
+              })}
+              <button type="submit" className={styles.botaoModal}>
+                Salvar
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmitAdd(onSubmitAdd)}>
+              <h2>Adicionar Item</h2>
+              {["descricao", "quantidade", "precoUnitario"].map((key) => (
+                <div key={key} className={styles.modalInputGroup}>
+                  <label htmlFor={key}>{key}</label>
+                  <input id={key} type="text" {...registerAdd(key)} />
+                </div>
+              ))}
+              <label>
+                Adicionando a nota de Identificador ({formValuesAdd.notaId})
+              </label>
+              <button type="submit" className={styles.botaoModal}>
+                Salvar
+              </button>
+            </form>
+          )}
+        </Modal>
+
+        <ConfirmDeleteModal
+          aberto={modalDeleteConfirm}
+          onFechar={() => setModalDeleteConfirm(false)}
+          headerMessage={mensagemDeleteVar}
+          onConfirmarDelete={() => {
+            deletarItemCliente(selectedRowId, formValues.descricao);
+            setModalDeleteConfirm(false);
+          }}
+        />
+      </Container>
     </>
   );
 }

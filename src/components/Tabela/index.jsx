@@ -1,7 +1,8 @@
+import { FaDollarSign, FaPen, FaPlus, FaTrash } from "react-icons/fa";
+
 import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import styles from "./Tabela.module.css";
-import { FaTrash, FaPlus, FaPen, FaDollarSign } from "react-icons/fa";
 
 const Tabela = ({
   rows,
@@ -16,40 +17,29 @@ const Tabela = ({
 }) => {
   return (
     <div className={className}>
-      <div className={styles.around_botoes_acao}>
-        {onAddClick && (
-          <button onClick={onAddClick}>
-            <FaPlus className={styles.icon} />
-          </button>
-        )}
-        {onEditClick && (
-          <button onClick={onEditClick}>
-            <FaPen className={styles.icon} />
-          </button>
-        )}
-        {onDollarClick && (
-          <button onClick={onDollarClick}>
-            <FaDollarSign className={styles.icon} />
-          </button>
-        )}
-        {onDeleteClick && (
-          <button onClick={onDeleteClick} className={styles.icon_trash}>
-            <FaTrash />
-          </button>
-        )}
+      {showActions && (
+        <div className={styles.areaAcoes}>
+          {onAddClick && (
+            <button onClick={onAddClick} className={styles.botaoAdd}>
+              <FaPlus />
+            </button>
+          )}
+        </div>
+      )}
+      <div className={styles.areaTabela}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={5}
+          autoHeight
+          getRowClassName={(params) =>
+            params.indexRelativeToCurrentPage % 2 === 0
+              ? styles.rowWhite
+              : styles.rowGray
+          }
+          onRowClick={onRowClick}
+        />
       </div>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={5}
-        autoHeight
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0
-            ? styles.rowWhite
-            : styles.rowGray
-        }
-        onRowClick={onRowClick}
-      />
     </div>
   );
 };

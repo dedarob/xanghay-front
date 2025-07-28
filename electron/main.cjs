@@ -11,6 +11,7 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
+
   win.webContents.openDevTools();
   win.loadURL("http://localhost:5173"); // URL onde o Vite vai rodar
 }
@@ -19,10 +20,14 @@ app.whenReady().then(() => {
   createWindow();
 
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
   });
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });

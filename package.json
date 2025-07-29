@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "backend": "java -jar backend/casamarmorista-0.0.1-SNAPSHOT.jar",
+    "open-browser": "wait-on http://localhost:5173 && npx open http://localhost:5173",
+    "start-app": "concurrently \"npm run dev\" \"npm run backend\" \"npm run open-browser\"",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "electron electron/main.cjs"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -39,6 +41,8 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "vite": "^6.3.0"
+    "vite": "^6.3.0",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
   }
 }

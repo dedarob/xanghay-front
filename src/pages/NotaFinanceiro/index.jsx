@@ -5,8 +5,10 @@ import Container from "../../components/Container";
 import DinheiroInput from "../../components/DinheiroInput";
 import Header from "../../components/Header";
 import { Link } from "react-router-dom";
+import { PiFilePdf } from "react-icons/pi";
 import SelectBox from "../../components/SelectBox";
 import Tabela from "../../components/Tabela";
+import autoTable from "jspdf-autotable";
 import axios from "axios";
 import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
 import jsPDF from "jspdf";
@@ -184,147 +186,75 @@ export default function NotaFinanceiro() {
   // Função para gerar relatório PDF abrangente
   function handleGerarRelatorioPDF() {
     const doc = new jsPDF();
-    const pageWidth = 210;
-    let y = 15;
 
-    doc.setFontSize(18);
-    doc.text("Relatório Financeiro de Notas", pageWidth / 2, y, {
-      align: "center",
-    });
-    y += 10;
+    // Título
+    doc.setFontSize(16);
+    doc.text("Relatório Financeiro de Notas", 105, 15, { align: "center" });
 
-    if (clienteSelecionado && clienteSelecionado.label) {
-      doc.setFontSize(12);
-      doc.text(`Cliente: ${clienteSelecionado.label}`, 10, y);
-      y += 8;
-    }
+    const headers = [
+      ["ID", "Emissão", "Valor", "Últ. Pag.", "Pago", "Restante", "Situação"],
+    ];
 
-    // Cabeçalho da tabela
-    doc.setFontSize(11);
-    doc.setFont(undefined, "bold");
-    doc.text("ID", 10, y);
-    doc.text("Emissão", 22, y);
-    doc.text("Valor", 48, y);
-    doc.text("Últ. Pag.", 70, y);
-    doc.text("Pago", 100, y);
-    doc.text("Restante", 125, y);
-    doc.text("Situação", 155, y);
-    doc.setFont(undefined, "normal");
-    y += 6;
-    doc.line(10, y, 200, y);
-    y += 4;
-
-    notasSortadas.forEach((nota) => {
-      if (y > 280) {
-        doc.addPage();
-        y = 15;
-      }
-      doc.text(String(nota.id), 10, y);
-      doc.text(
-        nota.dataEmissao
-          ? String(nota.dataEmissao).split("-").reverse().join("/")
-          : "-",
-        22,
-        y
-      );
-      doc.text(
-        `R$ ${Number(nota.valorTotal).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        48,
-        y
-      );
-      doc.text(
-        nota.ultimoPagamentoData
-          ? String(nota.ultimoPagamentoData).split("-").reverse().join("/")
-          : "-",
-        70,
-        y
-      );
-      doc.text(
-        `R$ ${Number(nota.valorPag).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        100,
-        y
-      );
-      doc.text(
-        `R$ ${Number(nota.resto).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        125,
-        y
-      );
-      let cor = "black";
-      if (nota.situacao === "PAGO") cor = "green";
-      else if (nota.situacao === "PARCIALMENTE PAGO") cor = "blue";
-      else if (nota.situacao === "EM ABERTO") cor = "red";
-      doc.setTextColor(cor);
-      doc.text(String(nota.situacao), 155, y);
-      doc.setTextColor("black");
-      y += 7;
-    });
-
-    y += 5;
-    // Totalizador
-    const totalNotas = notasSortadas.reduce(
-      (acc, n) => acc + (Number(n.valorTotal) || 0),
-      0
-    );
-    const totalRestante = notasSortadas.reduce(
-      (acc, n) => acc + (Number(n.resto) || 0),
-      0
-    );
-    doc.setFont(undefined, "bold");
-    doc.text(
-      `Total Notas: R$ ${totalNotas.toLocaleString("pt-BR", {
+    const data = notasSortadas.map((nota) => [
+      nota.id,
+      nota.dataEmissao ? nota.dataEmissao.split("-").reverse().join("/") : "-",
+      `R$ ${Number(nota.valorTotal).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
       })}`,
-      10,
-      y
-    );
-    doc.text(
-      `Total Restante: R$ ${totalRestante.toLocaleString("pt-BR", {
+      nota.ultimoPagamentoData
+        ? nota.ultimoPagamentoData.split("-").reverse().join("/")
+        : "-",
+      `R$ ${Number(nota.valorPag).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
       })}`,
-      80,
-      y
-    );
-    doc.setFont(undefined, "normal");
+      `R$ ${Number(nota.resto).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+      nota.situacao,
+    ]);
 
-    doc.save(
-      `relatorio-financeiro-${
-        clienteSelecionado
-          ? clienteSelecionado.label.replace(/\s+/g, "-")
-          : "todas"
-      }.pdf`
-    );
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 10,
+        lineWidth: 0.2, // bordas finas para todas as células
+        lineColor: [0, 0, 0], // bordas pretas
+      },
+      headStyles: {
+        fillColor: [255, 255, 255], // sem cor de fundo no cabeçalho
+        textColor: [0, 0, 0], // texto preto
+        lineWidth: 0.5,
+        lineColor: [0, 0, 0],
+        halign: "left", // opcional, alinhamento horizontal
+        valign: "middle",
+      },
+      didParseCell: function (data) {
+        if (data.column.index === 6) {
+          const situacao = data.cell.text[0];
+          if (situacao === "PAGO") data.cell.styles.textColor = [0, 128, 0];
+          else if (situacao === "PARCIALMENTE PAGO")
+            data.cell.styles.textColor = [0, 0, 255];
+          else if (situacao === "EM ABERTO")
+            data.cell.styles.textColor = [255, 0, 0];
+        }
+      },
+    });
+
+    doc.save("relatorio-financeiro.pdf");
   }
 
   return (
     <>
       <Header />
       <BotaoVoltar />
-      <button
-        onClick={handleGerarRelatorioPDF}
-        style={{
-          marginBottom: 16,
-          padding: "8px 18px",
-          borderRadius: 6,
-          border: "1px solid #1976d2",
-          background: "#1976d2",
-          color: "#fff",
-          fontWeight: 500,
-          fontSize: "1rem",
-          cursor: "pointer",
-        }}
-      >
-        Gerar Relatório PDF
-      </button>
+
       <div className={styles.bordaVerde}>
         <Container>
           <Link to={"/notas"}>Clique para voltar a visualização de notas</Link>
           <h1 style={{ color: "green" }}>Modo Financeiro</h1>
+
           <SelectBox
             options={clientes}
             isSearchable={true}
@@ -332,6 +262,21 @@ export default function NotaFinanceiro() {
             value={clienteSelecionado}
             placeholder="Clique para pesquisar o cliente"
           />
+          <button
+            onClick={handleGerarRelatorioPDF}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 6,
+              border: "1px solid #1976d2",
+              background: "#1976d2",
+              color: "#fff",
+              fontWeight: 500,
+              fontSize: "1.5rem",
+              cursor: "pointer",
+            }}
+          >
+            <PiFilePdf />
+          </button>
           <Tabela
             className={styles.tabelaFinanceiro}
             columns={columns}

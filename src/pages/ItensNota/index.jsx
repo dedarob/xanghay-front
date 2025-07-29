@@ -1,16 +1,18 @@
+import { BotaoVoltar } from "../../components/Container";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
 import DinheiroInput from "../../components/DinheiroInput";
 import Modal from "../../components/Modal";
+import { PiFilePdf } from "react-icons/pi";
 import { PiSubtitlesDuotone } from "react-icons/pi";
 import Tabela from "../../components/Tabela";
+import autoTable from "jspdf-autotable";
 import axios from "axios";
+import jsPDF from "jspdf";
 import styles from "./ItensNota.module.css";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { BotaoVoltar } from "../../components/Container";
-import jsPDF from "jspdf";
 
 function ItensNota() {
   const { idNota } = useParams();
@@ -164,65 +166,70 @@ function ItensNota() {
   // Função para gerar PDF dos itens da nota
   function handleGerarPDF() {
     const doc = new jsPDF();
-    const pageWidth = 210; // mm (A4)
+    const pageWidth = doc.internal.pageSize.getWidth();
     let y = 15;
 
-    // Cabeçalho
+    // Título
     doc.setFontSize(18);
     doc.text("Relatório de Itens da Nota", pageWidth / 2, y, {
       align: "center",
     });
     y += 10;
 
-    // Dados da Nota (ID)
+    // ID da Nota
     doc.setFontSize(12);
     doc.text(`Nota ID: ${idNota}`, 10, y);
     y += 8;
 
-    // Tabela - Cabeçalho
-    doc.setFontSize(12);
-    doc.setFont(undefined, "bold");
-    doc.text("Qtd", 10, y);
-    doc.text("Descrição", 30, y);
-    doc.text("Unitário", 120, y);
-    doc.text("Total", 160, y);
-    doc.setFont(undefined, "normal");
-    y += 6;
-    doc.line(10, y, 200, y);
-    y += 4;
+    // Montar dados para a tabela
+    const headers = [["Qtd", "Descrição", "Unitário", "Total"]];
+    const data = itens.map((item) => [
+      item.quantidade,
+      item.descricao,
+      `R$ ${Number(item.precoUnitario).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+      `R$ ${Number(item.precoTotal).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+    ]);
 
-    // Tabela - Itens
-    itens.forEach((item) => {
-      if (y > 280) {
-        doc.addPage();
-        y = 15;
-      }
-      doc.text(String(item.quantidade), 10, y);
-      doc.text(String(item.descricao), 30, y, { maxWidth: 85 });
-      doc.text(
-        `R$ ${Number(item.precoUnitario).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        120,
-        y
-      );
-      doc.text(
-        `R$ ${Number(item.precoTotal).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        160,
-        y
-      );
-      y += 7;
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: y,
+      styles: {
+        fontSize: 10,
+        cellPadding: 2,
+        lineColor: [0, 0, 0],
+        lineWidth: 0.3,
+      },
+      headStyles: {
+        fillColor: [255, 255, 255], // fundo branco
+        textColor: [0, 0, 0], // texto preto
+        lineColor: [0, 0, 0],
+        lineWidth: 0.5,
+        fontStyle: "bold",
+      },
+      columnStyles: {
+        0: { cellWidth: 15 }, // Qtd
+        1: { cellWidth: 90 }, // Descrição
+        2: { cellWidth: 35 }, // Unitário
+        3: { cellWidth: 35 }, // Total
+      },
+      margin: { left: 10, right: 10 },
+      didDrawPage: (data) => {
+        y = data.cursor.y + 5; // Atualiza y depois da tabela
+      },
     });
 
-    y += 5;
+    // Total Geral
     doc.setFont(undefined, "bold");
     doc.text(
       `Total Geral: R$ ${Number(totalNota).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
       })}`,
-      120,
+      pageWidth - 80,
       y
     );
     doc.setFont(undefined, "normal");
@@ -247,7 +254,7 @@ function ItensNota() {
           cursor: "pointer",
         }}
       >
-        Gerar PDF
+        <PiFilePdf />
       </button>
       <Tabela
         columns={columns}

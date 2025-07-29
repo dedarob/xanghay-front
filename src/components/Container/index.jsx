@@ -1,11 +1,12 @@
-import { useNavigate } from "react-router-dom";
+import { IoArrowBack } from "react-icons/io5";
 import styles from "./Container.module.css";
+import { useNavigate } from "react-router-dom";
 
 function Container({ children }) {
   return <section className={styles.container}>{children}</section>;
 }
 
-export function BotaoVoltar({ className = "", children = "Voltar" }) {
+export function BotaoVoltar({ className = "", children = <IoArrowBack /> }) {
   const navigate = useNavigate();
   return (
     <button

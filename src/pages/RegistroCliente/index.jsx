@@ -7,6 +7,7 @@ import { CgController } from "react-icons/cg";
 import Container from "../../components/Container";
 import { fetch } from "./service";
 import { useNavigate } from "react-router-dom";
+import { BotaoVoltar } from "../../components/Container";
 
 function RegistroCliente() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function RegistroCliente() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <div className={styles.areaFormCliente}>
           <form

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../../components/Modal";
 import { useForm } from "react-hook-form";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
+import { BotaoVoltar } from "../../components/Container";
 
 function VerClientes() {
   const navigate = useNavigate();
@@ -97,6 +98,7 @@ function VerClientes() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <div className={styles.viewVerClientes}>
           <Tabela

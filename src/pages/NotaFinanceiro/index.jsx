@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { BotaoVoltar } from "../../components/Container";
 import Container from "../../components/Container";
 import DinheiroInput from "../../components/DinheiroInput";
 import Header from "../../components/Header";
@@ -7,9 +8,10 @@ import { Link } from "react-router-dom";
 import SelectBox from "../../components/SelectBox";
 import Tabela from "../../components/Tabela";
 import axios from "axios";
+import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
+import jsPDF from "jspdf";
 import styles from "./NotaFinanceiro.module.css";
 import { useNavigate } from "react-router-dom";
-import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
 
 export default function NotaFinanceiro() {
   const navigate = useNavigate();
@@ -179,9 +181,146 @@ export default function NotaFinanceiro() {
     fetchNotas();
   }, [clienteSelecionado]);
 
+  // Função para gerar relatório PDF abrangente
+  function handleGerarRelatorioPDF() {
+    const doc = new jsPDF();
+    const pageWidth = 210;
+    let y = 15;
+
+    doc.setFontSize(18);
+    doc.text("Relatório Financeiro de Notas", pageWidth / 2, y, {
+      align: "center",
+    });
+    y += 10;
+
+    if (clienteSelecionado && clienteSelecionado.label) {
+      doc.setFontSize(12);
+      doc.text(`Cliente: ${clienteSelecionado.label}`, 10, y);
+      y += 8;
+    }
+
+    // Cabeçalho da tabela
+    doc.setFontSize(11);
+    doc.setFont(undefined, "bold");
+    doc.text("ID", 10, y);
+    doc.text("Emissão", 22, y);
+    doc.text("Valor", 48, y);
+    doc.text("Últ. Pag.", 70, y);
+    doc.text("Pago", 100, y);
+    doc.text("Restante", 125, y);
+    doc.text("Situação", 155, y);
+    doc.setFont(undefined, "normal");
+    y += 6;
+    doc.line(10, y, 200, y);
+    y += 4;
+
+    notasSortadas.forEach((nota) => {
+      if (y > 280) {
+        doc.addPage();
+        y = 15;
+      }
+      doc.text(String(nota.id), 10, y);
+      doc.text(
+        nota.dataEmissao
+          ? String(nota.dataEmissao).split("-").reverse().join("/")
+          : "-",
+        22,
+        y
+      );
+      doc.text(
+        `R$ ${Number(nota.valorTotal).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        48,
+        y
+      );
+      doc.text(
+        nota.ultimoPagamentoData
+          ? String(nota.ultimoPagamentoData).split("-").reverse().join("/")
+          : "-",
+        70,
+        y
+      );
+      doc.text(
+        `R$ ${Number(nota.valorPag).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        100,
+        y
+      );
+      doc.text(
+        `R$ ${Number(nota.resto).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        125,
+        y
+      );
+      let cor = "black";
+      if (nota.situacao === "PAGO") cor = "green";
+      else if (nota.situacao === "PARCIALMENTE PAGO") cor = "blue";
+      else if (nota.situacao === "EM ABERTO") cor = "red";
+      doc.setTextColor(cor);
+      doc.text(String(nota.situacao), 155, y);
+      doc.setTextColor("black");
+      y += 7;
+    });
+
+    y += 5;
+    // Totalizador
+    const totalNotas = notasSortadas.reduce(
+      (acc, n) => acc + (Number(n.valorTotal) || 0),
+      0
+    );
+    const totalRestante = notasSortadas.reduce(
+      (acc, n) => acc + (Number(n.resto) || 0),
+      0
+    );
+    doc.setFont(undefined, "bold");
+    doc.text(
+      `Total Notas: R$ ${totalNotas.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+      10,
+      y
+    );
+    doc.text(
+      `Total Restante: R$ ${totalRestante.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+      80,
+      y
+    );
+    doc.setFont(undefined, "normal");
+
+    doc.save(
+      `relatorio-financeiro-${
+        clienteSelecionado
+          ? clienteSelecionado.label.replace(/\s+/g, "-")
+          : "todas"
+      }.pdf`
+    );
+  }
+
   return (
     <>
       <Header />
+      <BotaoVoltar />
+      <button
+        onClick={handleGerarRelatorioPDF}
+        style={{
+          marginBottom: 16,
+          padding: "8px 18px",
+          borderRadius: 6,
+          border: "1px solid #1976d2",
+          background: "#1976d2",
+          color: "#fff",
+          fontWeight: 500,
+          fontSize: "1rem",
+          cursor: "pointer",
+        }}
+      >
+        Gerar Relatório PDF
+      </button>
       <div className={styles.bordaVerde}>
         <Container>
           <Link to={"/notas"}>Clique para voltar a visualização de notas</Link>

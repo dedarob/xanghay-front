@@ -7,6 +7,7 @@ import styles from "./EditarBoletos.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { BotaoVoltar } from "../../components/Container";
 
 export default function EditarBoletos() {
   const { register, handleSubmit, control, setValue } = useForm();
@@ -57,6 +58,7 @@ export default function EditarBoletos() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <div className={styles.areaFormCliente}>
           <form

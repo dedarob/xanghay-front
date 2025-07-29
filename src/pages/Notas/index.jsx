@@ -11,6 +11,7 @@ import styles from "./Notas.module.css";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
+import { BotaoVoltar } from "../../components/Container";
 
 function Notas() {
   const navigate = useNavigate();
@@ -94,6 +95,7 @@ function Notas() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <h2>Notas por Cliente</h2>
         <SelectBox

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabela de Serviços</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Incluindo a biblioteca jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Preencha a Tabela de Serviços</h1>
+    
+    <!-- Campos para o nome do cliente e endereço -->
+    <div class="form-group">
+      <label for="nome-cliente">Nome do Cliente:</label>
+      <input type="text" id="nome-cliente" class="input-field" placeholder="Digite o nome do cliente">
+    </div>
+
+    <div class="form-group">
+      <label for="endereco-cliente">Endereço:</label>
+      <input type="text" id="endereco-cliente" class="input-field" placeholder="Digite o endereço do cliente">
+    </div>
+
+    <!-- Tabela -->
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>Quantidade</th>
+          <th>Discriminação de Serviços</th>
+          <th>Valor Unitário</th>
+          <th>Valor Total</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="number" class="quantidade" value="1" min="1" onchange="calcularTotal()"></td>
+          <td><input type="text" class="discriminacao"></td>
+          <td><input type="number" class="valor-unitario" value="0" min="0" step="0.01" onchange="calcularTotal()"></td>
+          <td><input type="number" class="valor-total" value="0" readonly></td>
+          <td><button class="btn-excluir" onclick="excluirLinha(this)">X</button></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Botões lado a lado -->
+    <div class="actions">
+      <button class="btn" onclick="adicionarLinha()">Adicionar Linha</button>
+      <button class="btn" onclick="gerarPDF()">Gerar PDF</button>
+    </div>
+
+    <!-- Total Geral -->
+    <div class="total">
+      <strong>Total Geral: </strong><span id="total-geral">0.00</span>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

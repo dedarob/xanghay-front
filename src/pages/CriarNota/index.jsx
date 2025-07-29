@@ -10,6 +10,7 @@ import Container from "../../components/Container";
 import SelectBox from "../../components/SelectBox";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BotaoVoltar } from "../../components/Container";
 
 function CriarNota() {
   const apiPath = "/cliente";
@@ -98,6 +99,7 @@ function CriarNota() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <span>Tabela de Serviços</span>
         <form

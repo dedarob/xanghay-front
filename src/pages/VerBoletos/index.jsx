@@ -6,6 +6,7 @@ import Container from "../../components/Container";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
+import { BotaoVoltar } from "../../components/Container";
 
 export default function VerBoletos() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function VerBoletos() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <div className={styles.pagBoletos}>
           <div className={styles.areaTitulo}>

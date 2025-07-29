@@ -10,6 +10,7 @@ import axios from "axios";
 import styles from "./HistoricoPag.module.css";
 import { useLocation } from "react-router-dom";
 import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
+import { BotaoVoltar } from "../../components/Container";
 
 export default function HistoricoPag() {
   const location = useLocation();
@@ -183,6 +184,7 @@ export default function HistoricoPag() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <div className={styles.bordaVerde}>
         <Container>
           <Link to={"/notas"}>Clique para voltar a visualização de notas</Link>

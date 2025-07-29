@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BotaoVoltar } from "../../components/Container";
 
 export default function AddPagamentos() {
   const navigate = useNavigate();
@@ -94,6 +95,7 @@ export default function AddPagamentos() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <div className={styles.areaFormPagamentos}>
           <form

@@ -7,6 +7,7 @@ import { IoIosSave } from "react-icons/io";
 import styles from "./AddBoletos.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BotaoVoltar } from "../../components/Container";
 
 export default function AddBoletos() {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ export default function AddBoletos() {
   return (
     <>
       <Header />
+      <BotaoVoltar />
       <Container>
         <div className={styles.areaFormCliente}>
           <form

@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import { BotaoVoltar } from "../../components/Container";
+import jsPDF from "jspdf";
 
 function ItensNota() {
   const { idNota } = useParams();
@@ -159,8 +161,94 @@ function ItensNota() {
       .catch((error) => console.log(error.message));
   };
 
+  // Função para gerar PDF dos itens da nota
+  function handleGerarPDF() {
+    const doc = new jsPDF();
+    const pageWidth = 210; // mm (A4)
+    let y = 15;
+
+    // Cabeçalho
+    doc.setFontSize(18);
+    doc.text("Relatório de Itens da Nota", pageWidth / 2, y, {
+      align: "center",
+    });
+    y += 10;
+
+    // Dados da Nota (ID)
+    doc.setFontSize(12);
+    doc.text(`Nota ID: ${idNota}`, 10, y);
+    y += 8;
+
+    // Tabela - Cabeçalho
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.text("Qtd", 10, y);
+    doc.text("Descrição", 30, y);
+    doc.text("Unitário", 120, y);
+    doc.text("Total", 160, y);
+    doc.setFont(undefined, "normal");
+    y += 6;
+    doc.line(10, y, 200, y);
+    y += 4;
+
+    // Tabela - Itens
+    itens.forEach((item) => {
+      if (y > 280) {
+        doc.addPage();
+        y = 15;
+      }
+      doc.text(String(item.quantidade), 10, y);
+      doc.text(String(item.descricao), 30, y, { maxWidth: 85 });
+      doc.text(
+        `R$ ${Number(item.precoUnitario).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        120,
+        y
+      );
+      doc.text(
+        `R$ ${Number(item.precoTotal).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        160,
+        y
+      );
+      y += 7;
+    });
+
+    y += 5;
+    doc.setFont(undefined, "bold");
+    doc.text(
+      `Total Geral: R$ ${Number(totalNota).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+      120,
+      y
+    );
+    doc.setFont(undefined, "normal");
+
+    doc.save(`itens-nota-${idNota}.pdf`);
+  }
+
   return (
     <>
+      <BotaoVoltar />
+      <button
+        onClick={handleGerarPDF}
+        style={{
+          marginBottom: 16,
+          padding: "8px 18px",
+          borderRadius: 6,
+          border: "1px solid #1976d2",
+          background: "#1976d2",
+          color: "#fff",
+          fontWeight: 500,
+          fontSize: "1rem",
+          cursor: "pointer",
+        }}
+      >
+        Gerar PDF
+      </button>
       <Tabela
         columns={columns}
         rows={itens}

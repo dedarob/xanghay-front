@@ -162,15 +162,22 @@ function ItensNota() {
       })
       .catch((error) => console.log(error.message));
   };
-
+  function puxarDadosDoClienteParaPdf() {}
   // Função para gerar PDF dos itens da nota
   function handleGerarPDF() {
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_KEY}/cliente/pelo-id/${idNota}`)
+      .then((res) => {
+        const dadosDoCliente = res.data;
+      })
+      .catch((err) => console.log(err));
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     let y = 15;
 
     // Título
     doc.setFontSize(18);
+    doc.text("");
     doc.text("Relatório de Itens da Nota", pageWidth / 2, y, {
       align: "center",
     });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { BotaoVoltar } from "../../components/Container";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
 import Container from "../../components/Container";
 import DinheiroInput from "../../components/DinheiroInput";
@@ -7,11 +8,10 @@ import Header from "../../components/Header";
 import SelectBox from "../../components/SelectBox";
 import Tabela from "../../components/Tabela";
 import axios from "axios";
+import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
 import styles from "./Notas.module.css";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { formatarDataBrasileira } from "../../components/formatarDataBrasileira";
-import { BotaoVoltar } from "../../components/Container";
 
 function Notas() {
   const navigate = useNavigate();
@@ -111,7 +111,9 @@ function Notas() {
             rows={notas}
             onRowClick={(params) => {
               console.log("ID da nota:", params.row.id);
-              navigate(`/itens-nota/${params.row.id}`);
+              navigate(
+                `/itens-nota/${params.row.id}/${clienteSelecionado.value}`
+              );
             }}
             onDeleteClick={() => setModalDelete(true)}
             onDollarClick={() => navigate("/nota-fin")}

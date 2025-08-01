@@ -1,3 +1,5 @@
+import { useNavigate, useParams } from "react-router-dom";
+
 import { BotaoVoltar } from "../../components/Container";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
 import DinheiroInput from "../../components/DinheiroInput";
@@ -7,15 +9,16 @@ import { PiSubtitlesDuotone } from "react-icons/pi";
 import Tabela from "../../components/Tabela";
 import autoTable from "jspdf-autotable";
 import axios from "axios";
+import cabecalho from "../../assets/cabecalho.png";
 import jsPDF from "jspdf";
 import styles from "./ItensNota.module.css";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
 import { useState } from "react";
 
 function ItensNota() {
   const { idNota } = useParams();
+  const { idCliente } = useParams();
   const [itens, setItens] = useState([]);
   const [totalNotaPorObjeto, setTotalNotaPorObjeto] = useState(0);
   const [totalNota, setTotalNota] = useState(0);
@@ -29,6 +32,7 @@ function ItensNota() {
     setTotalNota(totalTodosItens);
     return itensAtualizados;
   }
+  const navigate = useNavigate();
   const buscarItensPorNota = () => {
     axios
       .get(`${import.meta.env.VITE_BACKEND_KEY}/notas/itens/${idNota}`)
@@ -164,84 +168,163 @@ function ItensNota() {
   };
   function puxarDadosDoClienteParaPdf() {}
   // Função para gerar PDF dos itens da nota
-  function handleGerarPDF() {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_KEY}/cliente/pelo-id/${idNota}`)
-      .then((res) => {
-        const dadosDoCliente = res.data;
-      })
-      .catch((err) => console.log(err));
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 15;
-
-    // Título
-    doc.setFontSize(18);
-    doc.text("");
-    doc.text("Relatório de Itens da Nota", pageWidth / 2, y, {
-      align: "center",
+  async function getImageDataUrl(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.crossOrigin = "anonymous"; // importante para evitar tainting se for carregado de outro domínio
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx)
+          return reject(new Error("Não foi possível obter contexto do canvas"));
+        ctx.drawImage(img, 0, 0);
+        try {
+          const dataUrl = canvas.toDataURL("image/png"); // força PNG
+          resolve(dataUrl);
+        } catch (e) {
+          reject(e);
+        }
+      };
+      img.onerror = (e) =>
+        reject(new Error("Falha ao carregar a imagem: " + e));
     });
-    y += 10;
+  }
 
-    // ID da Nota
-    doc.setFontSize(12);
-    doc.text(`Nota ID: ${idNota}`, 10, y);
-    y += 8;
-
-    // Montar dados para a tabela
-    const headers = [["Qtd", "Descrição", "Unitário", "Total"]];
-    const data = itens.map((item) => [
-      item.quantidade,
-      item.descricao,
-      `R$ ${Number(item.precoUnitario).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-      })}`,
-      `R$ ${Number(item.precoTotal).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-      })}`,
-    ]);
-
-    autoTable(doc, {
-      head: headers,
-      body: data,
-      startY: y,
-      styles: {
-        fontSize: 10,
-        cellPadding: 2,
-        lineColor: [0, 0, 0],
-        lineWidth: 0.3,
-      },
-      headStyles: {
-        fillColor: [255, 255, 255], // fundo branco
-        textColor: [0, 0, 0], // texto preto
-        lineColor: [0, 0, 0],
-        lineWidth: 0.5,
-        fontStyle: "bold",
-      },
-      columnStyles: {
-        0: { cellWidth: 15 }, // Qtd
-        1: { cellWidth: 90 }, // Descrição
-        2: { cellWidth: 35 }, // Unitário
-        3: { cellWidth: 35 }, // Total
-      },
-      margin: { left: 10, right: 10 },
-      didDrawPage: (data) => {
-        y = data.cursor.y + 5; // Atualiza y depois da tabela
-      },
+  async function fetchImageAsDataURL(url) {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") resolve(reader.result);
+        else reject("Erro convertendo imagem");
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
     });
+  }
+  function sanitizeNomeCliente(nome) {
+    // remove acentos
+    const semAcento = nome.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+    // mantém apenas letras, números e hífens, troca espaços por hífen
+    return semAcento
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^A-Za-z0-9\-]/g, "")
+      .toUpperCase();
+  }
+  async function handleGerarPDF() {
+    try {
+      // Busca cliente e imagem em paralelo
+      const [clienteRes, imagemDataUrl] = await Promise.all([
+        axios.get(
+          `${import.meta.env.VITE_BACKEND_KEY}/cliente/pelo-id/${idCliente}`
+        ),
+        getImageDataUrl(cabecalho),
+      ]);
 
-    // Total Geral
-    doc.setFont(undefined, "bold");
-    doc.text(
-      `Total Geral: R$ ${Number(totalNota).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-      })}`,
-      pageWidth - 80,
-      y
-    );
-    doc.setFont(undefined, "normal");
+      const dadosDoCliente = clienteRes.data;
 
-    doc.save(`itens-nota-${idNota}.pdf`);
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      let y = 10;
+
+      // Desenha cabeçalho com imagem (mantém proporção)
+      const imgProps = doc.getImageProperties(imagemDataUrl);
+      const maxImgWidth = pageWidth - 20; // margem 10 de cada lado
+      const ratio = imgProps.width / imgProps.height;
+      const imgWidth = Math.min(maxImgWidth, imgProps.width);
+      const imgHeight = imgWidth / ratio;
+      doc.addImage(imagemDataUrl, "PNG", 10, y, imgWidth, imgHeight);
+      y += imgHeight + 6;
+
+      // Título
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      y += 8;
+
+      // Dados do cliente
+      doc.setFontSize(11);
+      doc.setFont(undefined, "normal");
+      doc.text(`Cliente: ${dadosDoCliente.nomeCliente}`, 10, y);
+      doc.text(`Cidade: ${dadosDoCliente.cidadeCliente}`, 10, y + 6);
+      doc.text(`Endereço: ${dadosDoCliente.enderecoCliente}`, 10, y + 12);
+      doc.text(`Telefone: ${dadosDoCliente.telefoneCliente}`, 10, y + 18);
+      y += 24;
+
+      // ID da Nota
+      doc.setFont(undefined, "bold");
+      doc.text(`Nota ID: ${idNota}`, 10, y);
+      y += 8;
+      doc.setFont(undefined, "normal");
+
+      // Montar dados para a tabela
+      const headers = [["Qtd", "Descrição", "Unitário", "Total"]];
+      const data = itens.map((item) => [
+        item.quantidade,
+        item.descricao,
+        `R$ ${Number(item.precoUnitario).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        `R$ ${Number(item.precoTotal).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+      ]);
+
+      autoTable(doc, {
+        head: headers,
+        body: data,
+        startY: y,
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+          lineColor: [0, 0, 0],
+          lineWidth: 0.3,
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.5,
+          fontStyle: "bold",
+        },
+        columnStyles: {
+          0: { cellWidth: 15 },
+          1: { cellWidth: 90 },
+          2: { cellWidth: 35 },
+          3: { cellWidth: 35 },
+        },
+        margin: { left: 10, right: 10 },
+        didDrawPage: (data) => {
+          y = data.cursor.y + 6;
+        },
+      });
+
+      // Total Geral (colocado abaixo da tabela)
+      doc.setFont(undefined, "bold");
+      const totalText = `Total Geral: R$ ${Number(totalNota).toLocaleString(
+        "pt-BR",
+        {
+          minimumFractionDigits: 2,
+        }
+      )}`;
+      // calcula largura do texto pra alinhar à direita com margem
+      const textWidth = doc.getTextWidth(totalText);
+      doc.text(totalText, pageWidth - 10 - textWidth, y);
+
+      // Salva
+      const nomeSanitizado = sanitizeNomeCliente(
+        dadosDoCliente.nomeCliente || "SEM-NOME"
+      );
+      const fileName = `${nomeSanitizado}-${idNota}-.pdf`;
+      doc.save(fileName);
+    } catch (err) {
+      console.error("Erro gerando PDF:", err);
+      alert("Falha ao gerar PDF. Veja o console para mais detalhes.");
+    }
   }
 
   return (
